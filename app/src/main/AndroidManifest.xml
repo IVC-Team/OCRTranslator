@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="com.ndanh.mytranslator">
+
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <uses-permission android:name="android.permission.CAMERA"/>
+
+    <uses-feature android:name="android.hardware.camera"/>
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="18"/>
+
+    <application
+        android:name=".App"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/AppThemeDark">
+        <activity
+            android:name=".screen.text.TextTranslatorActivity"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+        <activity android:name=".screen.voice.VoiceTranslatorActivity">
+        </activity>
+        <activity android:name=".screen.history.HistoryActivity">
+
+        </activity>
+        <activity
+            android:name=".screen.splash.SplashActivity"
+            android:theme="@style/AppThemeDark">
+
+        </activity>
+        <activity
+            android:name=".screen.camera.CameraActivity"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity android:name=".screen.settings.SettingActivity">
+
+        </activity>
+        <activity android:name=".screen.about.AboutActivity">
+        </activity>
+        <activity android:name=".screen.help.HelpActivity">
+        </activity>
+        <activity android:name=".screen.privacypolicy.PrivacyPolicyActivity">
+        </activity>
+    </application>
+
+</manifest>

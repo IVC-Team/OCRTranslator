@@ -1,6 +1,5 @@
 package com.ndanh.mytranslator.screen.camera;
 
-import com.ndanh.mytranslator.model.Detection;
 import com.ndanh.mytranslator.model.Frame;
 import com.ndanh.mytranslator.modulesimpl.TextDetextModuleImpl;
 import com.ndanh.mytranslator.services.IDetector;

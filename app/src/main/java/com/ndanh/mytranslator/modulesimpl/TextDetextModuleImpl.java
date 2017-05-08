@@ -12,7 +12,6 @@ import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.ndanh.mytranslator.model.Detection;
 import com.ndanh.mytranslator.model.Frame;
 import com.ndanh.mytranslator.services.IDetector;
 import com.ndanh.mytranslator.util.MyTessOCR;

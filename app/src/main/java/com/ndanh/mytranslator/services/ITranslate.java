@@ -1,6 +1,5 @@
 package com.ndanh.mytranslator.services;
 
-import com.ndanh.mytranslator.model.Detection;
 import com.ndanh.mytranslator.modulesimpl.TextDetextModuleImpl;
 
 /**

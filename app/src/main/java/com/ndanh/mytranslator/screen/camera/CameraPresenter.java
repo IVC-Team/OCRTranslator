@@ -1,7 +1,5 @@
 package com.ndanh.mytranslator.screen.camera;
 
-import com.ndanh.mytranslator.model.Frame;
-import com.ndanh.mytranslator.modulesimpl.TextDetextModuleImpl;
 import com.ndanh.mytranslator.services.IDetector;
 import com.ndanh.mytranslator.services.ITranslate;
 
@@ -14,38 +12,14 @@ public class CameraPresenter implements CameraContract.ICameraPresenter {
     private IDetector mDetector;
     private ITranslate mTranslate;
     private static final String TAG = "CameraPresenter";
-    private IDetector.OnDetectListener detectListener = new IDetector.OnDetectListener() {
-        @Override
-        public void onSuccess(TextDetextModuleImpl.Detection detection) {
-            mTranslate.translate(detection);//TODO: implement translate
-        }
-
-        @Override
-        public void onFailed(String msg) {
-
-        }
-    };
-
-    private ITranslate.OnTranslateListener translateListener = new ITranslate.OnTranslateListener() {
-        @Override
-        public void onSuccess(String result) {
-
-        }
-
-        @Override
-        public void onFailed(String msg) {
-
-        }
-    };
 
     private CameraContract.ICameraView mView;
 
-    public CameraPresenter(CameraContract.ICameraView view, IDetector IDetector, ITranslate translate){
+    public CameraPresenter(CameraContract.ICameraView view, IDetector detector, ITranslate translate){
         this.mView = view;
-        this.mDetector = IDetector;
+        this.mDetector = detector;
         this.mTranslate = translate;
         mView.setPresenter(this);
-        mDetector.setDetectListener(detectListener);
     }
 
     @Override
@@ -55,7 +29,7 @@ public class CameraPresenter implements CameraContract.ICameraPresenter {
 
     @Override
     public void stop() {
-
+        this.mView = null;
     }
 
     @Override
@@ -63,8 +37,4 @@ public class CameraPresenter implements CameraContract.ICameraPresenter {
 
     }
 
-    @Override
-    public void getPreviewFrame(Frame frame) {
-        mDetector.receiveFrame(frame);
-    }
 }

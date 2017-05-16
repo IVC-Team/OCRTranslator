@@ -10,10 +10,15 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
-
     </LinearLayout>
     <ImageView
         android:id="@+id/tranlate_result"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
+    <LinearLayout
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <include layout="@layout/navigation_bar"/>
+    </LinearLayout>
 </RelativeLayout>

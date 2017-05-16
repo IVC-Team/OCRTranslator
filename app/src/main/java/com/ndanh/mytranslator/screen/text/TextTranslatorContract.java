@@ -2,6 +2,7 @@ package com.ndanh.mytranslator.screen.text;
 
 import com.ndanh.mytranslator.base.BasePresenter;
 import com.ndanh.mytranslator.base.BaseView;
+import com.ndanh.mytranslator.model.Language;
 
 /**
  * Created by ndanh on 3/30/2017.
@@ -10,8 +11,8 @@ import com.ndanh.mytranslator.base.BaseView;
 public interface TextTranslatorContract {
     interface ITextTranslatorView extends BaseView<ITextTranslatorPresenter> {
         void displayResultTranslate(String result);
-        String getSrcLang();
-        String getDestLang();
+        Language.ELanguage getSrcLang();
+        Language.ELanguage getDestLang();
         String getTextSrc();
     }
     interface ITextTranslatorPresenter extends BasePresenter{

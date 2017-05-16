@@ -1,5 +1,9 @@
 package com.ndanh.mytranslator.screen.text;
 
+import com.ndanh.mytranslator.model.History;
+import com.ndanh.mytranslator.model.Language;
+import com.ndanh.mytranslator.modulesimpl.HistoryDaoImp;
+import com.ndanh.mytranslator.services.DAO.HistoryDao;
 import com.ndanh.mytranslator.services.ITranslate;
 
 /**
@@ -8,13 +12,15 @@ import com.ndanh.mytranslator.services.ITranslate;
 
 public class TextTranslatorPresenter implements TextTranslatorContract.ITextTranslatorPresenter {
 
+    private HistoryDao historyDao;
     private TextTranslatorContract.ITextTranslatorView view;
     private ITranslate iTranslate;
 
-    public TextTranslatorPresenter(TextTranslatorContract.ITextTranslatorView view, ITranslate iTranslate){
+    public TextTranslatorPresenter(TextTranslatorContract.ITextTranslatorView view, ITranslate iTranslate, HistoryDao historyDao){
         this.view = view;
         view.setPresenter(this);
         this.iTranslate = iTranslate;
+        this.historyDao = historyDao;
     }
 
     @Override
@@ -26,6 +32,7 @@ public class TextTranslatorPresenter implements TextTranslatorContract.ITextTran
         view = null;
         iTranslate = null;
         translateListener = null;
+        historyDao = null;
     }
 
     @Override
@@ -35,12 +42,13 @@ public class TextTranslatorPresenter implements TextTranslatorContract.ITextTran
 
     @Override
     public void doTranslate() {
-        iTranslate.translate(view.getTextSrc(), view.getSrcLang(), view.getDestLang());
+        iTranslate.translate(view.getTextSrc(), Language.getShortLanguage ( view.getSrcLang() ),Language.getShortLanguage ( view.getDestLang() ) );
     }
 
     private ITranslate.OnTranslateListener translateListener = new ITranslate.OnTranslateListener() {
         @Override
         public void onSuccess(String result) {
+            historyDao.addHistory ( new History ( Language.getLongLanguage (view.getSrcLang ()), Language.getLongLanguage ( view.getDestLang ()), view.getTextSrc (), result) );
             view.displayResultTranslate(result);
         }
 

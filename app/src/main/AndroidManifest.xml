@@ -22,35 +22,47 @@
         android:theme="@style/AppThemeDark">
         <activity
             android:name=".screen.text.TextTranslatorActivity"
-            android:windowSoftInputMode="adjustResize">
+            android:windowSoftInputMode="adjustResize"
+            android:screenOrientation="portrait">
+
+        </activity>
+        <activity android:name=".screen.voice.VoiceTranslatorActivity"
+                  android:screenOrientation="portrait">
+        </activity>
+        <activity android:name=".screen.history.HistoryActivity"
+                  android:screenOrientation="portrait">
+
+        </activity>
+        <activity
+            android:name=".screen.splash.SplashActivity"
+            android:theme="@style/AppThemeDark"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".screen.voice.VoiceTranslatorActivity">
-        </activity>
-        <activity android:name=".screen.history.HistoryActivity">
-
-        </activity>
-        <activity
-            android:name=".screen.splash.SplashActivity"
-            android:theme="@style/AppThemeDark">
-
-        </activity>
         <activity
             android:name=".screen.camera.CameraActivity"
             android:screenOrientation="portrait">
         </activity>
-        <activity android:name=".screen.settings.SettingActivity">
+        <activity android:name=".screen.settings.SettingActivity"
+                  android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
 
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
         </activity>
-        <activity android:name=".screen.about.AboutActivity">
+        <activity android:name=".screen.about.AboutActivity"
+                  android:screenOrientation="portrait">
         </activity>
-        <activity android:name=".screen.help.HelpActivity">
+        <activity android:name=".screen.help.HelpActivity"
+                  android:screenOrientation="portrait">
         </activity>
-        <activity android:name=".screen.privacypolicy.PrivacyPolicyActivity">
+        <activity android:name=".screen.privacypolicy.PrivacyPolicyActivity"
+                  android:screenOrientation="portrait">
         </activity>
     </application>
 

@@ -8,7 +8,6 @@ import com.ndanh.mytranslator.modulesimpl.TextDetextModuleImpl;
 
 public interface ITranslate {
     void translate(String src, String srclang, String destLang);
-    void translate(TextDetextModuleImpl.Detection detection);
     void setOnTranslateListener(OnTranslateListener listener);
     interface OnTranslateListener{
         void onSuccess(String result);

@@ -1,6 +1,5 @@
 package com.ndanh.mytranslator.screen.voice;
 
-import java.security.Permissions;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -9,12 +8,10 @@ import android.Manifest;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.v7.widget.PopupMenu;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -24,16 +21,18 @@ import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import com.ndanh.mytranslator.R;
+import com.ndanh.mytranslator.base.NavigatorFooterActivity;
 import com.ndanh.mytranslator.model.Language;
+import com.ndanh.mytranslator.modulesimpl.HistoryDaoImp;
 import com.ndanh.mytranslator.modulesimpl.ModuleManageImpl;
-import com.ndanh.mytranslator.screen.text.TextTranslatorActivity;
+import com.ndanh.mytranslator.util.CLog;
 import com.ndanh.mytranslator.util.PermissionHelper;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class VoiceTranslatorActivity extends Activity implements VoiceTranslatorContract.IVoiceTranslatorView {
+public class VoiceTranslatorActivity extends NavigatorFooterActivity implements VoiceTranslatorContract.IVoiceTranslatorView {
 
     //Bind View Region
     @BindView(R.id.action_choose_source)
@@ -48,83 +47,79 @@ public class VoiceTranslatorActivity extends Activity implements VoiceTranslator
     ToggleButton toggleButton;
     @BindView ( R.id.micro_background )
     RelativeLayout microBG;
+    @BindView ( R.id.navigation_footer_voice )
+    RelativeLayout hiddenPanel;
 
     //private properties
     private @IdRes
     int selectedButtonId;
-    private Language srcLang, destLang;
+    private Language.ELanguage srcLang, destLang;
     private SpeechRecognizer speech = null;
     private Intent recognizerIntent;
-    private String LOG_TAG = "VoiceTranslatorActivity";
-    private Map<String, Intent> intentMap = new HashMap<String, Intent>();
+    private static final String LOG_TAG = "VoiceTranslatorActivity";
+    private Map<Language.ELanguage, Intent> intentMap = new HashMap<Language.ELanguage, Intent>();
     private VoiceTranslatorContract.IVoiceTranslatorPresenter mPresenter;
-
+    private static final String STRING_EMPTY = "";
     //Listeners
-    private PopupMenu.OnMenuItemClickListener popupMenuNavigatorListener = new PopupMenu.OnMenuItemClickListener() {
-        @Override
-        public boolean onMenuItemClick(MenuItem item) {
-            return true;
-        }
-    };
 
     private RecognitionListener recognitionListener = new RecognitionListener () {
         @Override
         public void onBeginningOfSpeech() {
-            Log.i(LOG_TAG, "onBeginningOfSpeech");
+            CLog.i(LOG_TAG, "onBeginningOfSpeech");
         }
 
         @Override
         public void onBufferReceived(byte[] buffer) {
-            Log.i(LOG_TAG, "onBufferReceived: " + buffer);
+            CLog.i(LOG_TAG, "onBufferReceived: " + buffer);
         }
 
         @Override
         public void onEndOfSpeech() {
-            Log.i(LOG_TAG, "onEndOfSpeech");
+            CLog.i(LOG_TAG, "onEndOfSpeech");
             toggleButton.setChecked(false);
         }
 
         @Override
         public void onError(int errorCode) {
             String errorMessage = getErrorText(errorCode);
-            Log.d(LOG_TAG, "FAILED " + errorMessage);
+            CLog.d(LOG_TAG, "FAILED " + errorMessage);
             textSource.setText(errorMessage);
-            textTranslate.setText("");
+            textTranslate.setText(STRING_EMPTY);
             toggleButton.setChecked(false);
             stopRecognizer();
         }
 
         @Override
         public void onEvent(int arg0, Bundle arg1) {
-            Log.i(LOG_TAG, "onEvent");
+            CLog.i(LOG_TAG, "onEvent");
         }
 
         @Override
         public void onPartialResults(Bundle arg0) {
-            Log.i(LOG_TAG, "onPartialResults");
+            CLog.i(LOG_TAG, "onPartialResults");
         }
 
         @Override
         public void onReadyForSpeech(Bundle arg0) {
-            Log.i(LOG_TAG, "onReadyForSpeech");
+            CLog.i(LOG_TAG, "onReadyForSpeech");
         }
 
         @Override
         public void onResults(Bundle results) {
-            Log.i(LOG_TAG, "onResults");
+            CLog.i(LOG_TAG, "onResults");
             ArrayList<String> matches = results
                     .getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
-            String text = matches.size () > 0 ? matches.get(0) : "";
+            String text = matches.size () > 0 ? matches.get(0) : STRING_EMPTY;
             textSource.setText(text);
             if(srcLang == destLang)
                 textTranslate.setText(text);
             else
-                mPresenter.doTranslate (text);
+                mPresenter.doTranslate ();
         }
 
         @Override
         public void onRmsChanged(float rmsdB) {
-            Log.i(LOG_TAG, "onRmsChanged: " + rmsdB);
+            CLog.i(LOG_TAG, "onRmsChanged: " + rmsdB);
         }
 
     };
@@ -135,13 +130,13 @@ public class VoiceTranslatorActivity extends Activity implements VoiceTranslator
             Button tempButton = (Button) findViewById( selectedButtonId );
             switch (selectedButtonId){
                 case R.id.action_choose_source:
-                    srcLang.changeLanguage(item.getTitle ().toString ());
+                    srcLang = Language.setLangFromMenu(item.getItemId ());
                     setRecognizeIntent ();
-                    tempButton.setText(srcLang.toString ());
+                    tempButton.setText(Language.getLongLanguage ( srcLang ));
                     break;
                 case R.id.action_choose_dest:
-                    destLang.changeLanguage(item.getTitle ().toString ());
-                    tempButton.setText(destLang.toString ());
+                    destLang = Language.setLangFromMenu(item.getItemId ());
+                    tempButton.setText(Language.getLongLanguage ( destLang ));
                     break;
                 default:
                     break;
@@ -149,7 +144,6 @@ public class VoiceTranslatorActivity extends Activity implements VoiceTranslator
             return true;
         }
     };
-
 
     private CompoundButton.OnCheckedChangeListener toggleButtonListener = new CompoundButton.OnCheckedChangeListener () {
         @Override
@@ -177,6 +171,7 @@ public class VoiceTranslatorActivity extends Activity implements VoiceTranslator
         ButterKnife.bind ( this );
         initView();
         PermissionHelper.requestPermission ( this, Manifest.permission.RECORD_AUDIO );
+        PermissionHelper.requestPermission ( this, Manifest.permission.WRITE_EXTERNAL_STORAGE );
     }
 
     @Override
@@ -192,39 +187,26 @@ public class VoiceTranslatorActivity extends Activity implements VoiceTranslator
     }
 
     //Onclick region
-    @OnClick(R.id.nav_text_screen)
-    public void transferToTextScreen(View view) {
-        Intent intent = new Intent ( VoiceTranslatorActivity.this, TextTranslatorActivity.class );
-        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-        startActivity ( intent );
-    }
-
-    @OnClick(R.id.nav_other_pages)
-    public void doNavOtherPage(View view) {
-        PopupMenu pum = new PopupMenu(this, findViewById(view.getId()));
-        pum.inflate(R.menu.nav_menu);
-        pum.setOnMenuItemClickListener(popupMenuNavigatorListener);
-        pum.show();
-    }
 
     @OnClick(R.id.action_change)
     public void changeLanguage(View v){
 
         //Change Language
-        String temp = srcLang.toString();
-        srcLang.changeLanguage ( destLang.toString () );
-        destLang.changeLanguage ( temp );
-        chooseSourceLang.setText(srcLang.toString ());
-        chooseDestLang.setText(destLang.toString ());
+        Language.ELanguage tempLang = srcLang;
+        srcLang = destLang ;
+        destLang = tempLang ;
+
+        chooseSourceLang.setText(Language.getLongLanguage ( srcLang ));
+        chooseDestLang.setText(Language.getLongLanguage ( destLang ));
 
         //Set text from result text view to edit text
-        temp = textTranslate.getText ().toString ();
+        String temp = textTranslate.getText ().toString ();
         textSource.setText ( temp );
 
-        if(temp.equals ( "" )) return;
+        if(temp.equals ( STRING_EMPTY )) return;
 
         // Do translate when change language
-        this.mPresenter.doTranslate(temp);
+        this.mPresenter.doTranslate();
     }
 
     @OnClick({R.id.action_choose_source,R.id.action_choose_dest})
@@ -239,7 +221,7 @@ public class VoiceTranslatorActivity extends Activity implements VoiceTranslator
     //Override presenter methods
     @Override
     public void initPresenter() {
-        new VoiceTranslatorPresenter (this, ModuleManageImpl.getInstance().getTranslateModule());
+        new VoiceTranslatorPresenter (this, ModuleManageImpl.getInstance().getTranslateModule(), new HistoryDaoImp ( getApplicationContext () ));
     }
 
     @Override
@@ -253,58 +235,53 @@ public class VoiceTranslatorActivity extends Activity implements VoiceTranslator
     }
 
     @Override
-    public String getSrcLang() {
-        return srcLang.getShortLanguage ();
+    public Language.ELanguage getSrcLang() {
+        return srcLang;
     }
 
     @Override
-    public String getDestLang() {
-        return destLang.getShortLanguage ();
+    public Language.ELanguage getDestLang() {
+        return destLang;
+    }
+
+    @Override
+    public String getTextSrc() {
+        return textTranslate.getText ().toString ();
     }
 
     //private methods
-    private static String getErrorText(int errorCode) {
-        String message;
+    private String getErrorText(int errorCode) {
         switch (errorCode) {
             case SpeechRecognizer.ERROR_AUDIO:
-                message = "Audio recording error";
-                break;
+                return getString ( R.string.voice_error_audio );
             case SpeechRecognizer.ERROR_CLIENT:
-                message = "Client side error";
-                break;
+                return getString ( R.string.voice_error_client );
             case SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS:
-                message = "Insufficient permissions";
-                break;
+                return getString ( R.string.voice_error_insufficient_permissions );
             case SpeechRecognizer.ERROR_NETWORK:
-                message = "Network error";
-                break;
+                return getString ( R.string.voice_error_network );
             case SpeechRecognizer.ERROR_NETWORK_TIMEOUT:
-                message = "Network timeout";
-                break;
+                return getString ( R.string.voice_error_network_timeout );
             case SpeechRecognizer.ERROR_NO_MATCH:
-                message = "No match";
-                break;
+                return getString ( R.string.voice_error_no_match );
             case SpeechRecognizer.ERROR_RECOGNIZER_BUSY:
-                message = "RecognitionService busy";
-                break;
+                return getString ( R.string.voice_error_recognizer_busy );
             case SpeechRecognizer.ERROR_SERVER:
-                message = "error from server";
-                break;
+                return getString ( R.string.voice_error_server );
             case SpeechRecognizer.ERROR_SPEECH_TIMEOUT:
-                message = "No speech input";
-                break;
+                return getString ( R.string.voice_error_speech_timeout );
             default:
-                message = "Didn't understand, please try again.";
-                break;
+                return getString ( R.string.voice_error_default );
         }
-        return message;
     }
 
     private void initView() {
-        srcLang = new Language ( Language.ELanguage.ENGLISH );
-        destLang = new Language ( Language.ELanguage.JAPANESE );
-        chooseSourceLang.setText(srcLang.toString ());
-        chooseDestLang.setText(destLang.toString ());
+        srcLang = Language.ELanguage.ENG;
+        destLang = Language.ELanguage.JAP;
+
+        chooseSourceLang.setText(Language.getLongLanguage ( srcLang ));
+        chooseDestLang.setText(Language.getLongLanguage ( destLang ));
+
         startRecognizer();
         toggleButton.setOnCheckedChangeListener(toggleButtonListener);
     }
@@ -319,15 +296,15 @@ public class VoiceTranslatorActivity extends Activity implements VoiceTranslator
     }
 
     private void setRecognizeIntent(){
-        if(!intentMap.containsKey (srcLang.getLocaleString ())){
+        if(!intentMap.containsKey (srcLang)){
             Intent tempIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-            tempIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE,  srcLang.getLocaleString ());
+            tempIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE,  Language.getLocaleString ( srcLang ));
             tempIntent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, this.getPackageName());
             tempIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
             tempIntent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1);
-            intentMap.put(srcLang.getLocaleString (), tempIntent);
+            intentMap.put(srcLang , tempIntent);
         }
-        recognizerIntent = intentMap.get ( srcLang.getLocaleString () );
+        recognizerIntent = intentMap.get ( srcLang );
     }
 
     private void stopRecognizer(){
@@ -335,9 +312,15 @@ public class VoiceTranslatorActivity extends Activity implements VoiceTranslator
         speech.destroy();
         speech = null;
     }
+
     @Override
     protected void onResume() {
         super.onResume ();
         this.mPresenter.resume ();
+    }
+
+    @Override
+    public void invisibleView() {
+        hiddenPanel.setVisibility ( View.GONE );
     }
 }

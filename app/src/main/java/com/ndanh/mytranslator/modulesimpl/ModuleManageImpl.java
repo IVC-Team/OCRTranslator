@@ -2,13 +2,10 @@ package com.ndanh.mytranslator.modulesimpl;
 
 import android.content.Context;
 
-import com.ndanh.mytranslator.model.Frame;
 import com.ndanh.mytranslator.services.IDetector;
 import com.ndanh.mytranslator.services.ITranslate;
 import com.ndanh.mytranslator.services.IVoiceDetect;
 import com.ndanh.mytranslator.services.ModuleManager;
-
-import java.nio.ByteBuffer;
 
 /**
  * Created by ndanh on 3/31/2017.

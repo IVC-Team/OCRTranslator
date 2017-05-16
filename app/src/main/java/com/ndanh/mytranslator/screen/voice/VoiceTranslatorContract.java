@@ -2,6 +2,7 @@ package com.ndanh.mytranslator.screen.voice;
 
 import com.ndanh.mytranslator.base.BasePresenter;
 import com.ndanh.mytranslator.base.BaseView;
+import com.ndanh.mytranslator.model.Language;
 
 /**
  * Created by ndanh on 4/28/2017.
@@ -10,10 +11,11 @@ import com.ndanh.mytranslator.base.BaseView;
 public interface VoiceTranslatorContract {
     interface IVoiceTranslatorView extends BaseView<IVoiceTranslatorPresenter> {
         void displayResultTranslate(String result);
-        String getSrcLang();
-        String getDestLang();
+        Language.ELanguage getSrcLang();
+        Language.ELanguage getDestLang();
+        String getTextSrc();
     }
     interface IVoiceTranslatorPresenter extends BasePresenter {
-        void doTranslate(String text);
+        void doTranslate();
     }
 }

@@ -1,14 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
+        android:id="@+id/lang_id1"
         android:title="@string/lang_eng"
         android:titleCondensed="@string/short_lang_eng"
         android:visible="true"/>
     <item
+        android:id="@+id/lang_id2"
         android:title="@string/lang_jpn"
         android:titleCondensed="@string/short_lang_jpn"
         android:visible="true"/>
     <item
+        android:id="@+id/lang_id3"
         android:title="@string/lang_vie"
         android:titleCondensed="@string/short_lang_vie"
         android:visible="true"/>

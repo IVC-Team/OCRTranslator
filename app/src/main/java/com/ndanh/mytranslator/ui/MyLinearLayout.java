@@ -1,8 +1,10 @@
 package com.ndanh.mytranslator.ui;
 
+import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.widget.LinearLayout;
 
 /**
@@ -18,12 +20,14 @@ public class MyLinearLayout extends LinearLayout {
 
     @Override
     protected void onMeasure(final int widthMeasureSpec, final int heightMeasureSpec) {
+
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        ((Activity) getContext()).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int height = displayMetrics.heightPixels;
+        int width = displayMetrics.widthPixels;
         if (onSoftKeyboardListener != null) {
             final int newSpec = MeasureSpec.getSize(heightMeasureSpec);
-            final int oldSpec = getMeasuredHeight();
-            if (oldSpec == newSpec){
-                onSoftKeyboardListener.onNoChanged();
-            } else if (oldSpec - newSpec > 200 ){
+            if((height - newSpec) > (height /4) ){
                 onSoftKeyboardListener.onShown();
             } else {
                 onSoftKeyboardListener.onHidden();
@@ -37,9 +41,8 @@ public class MyLinearLayout extends LinearLayout {
     }
 
     public interface OnSoftKeyboardListener {
-        public void onShown();
-        public void onHidden();
-        public void onNoChanged();
+        void onShown();
+        void onHidden();
     }
 
 }

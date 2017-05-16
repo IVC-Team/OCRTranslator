@@ -2,10 +2,8 @@ package com.ndanh.mytranslator.util;
 
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
-import android.graphics.Rect;
 import android.os.Environment;
 import android.support.annotation.StringDef;
-import android.util.Log;
 
 import com.googlecode.tesseract.android.ResultIterator;
 import com.googlecode.tesseract.android.TessBaseAPI;
@@ -17,8 +15,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by ndanh on 3/23/2017.
@@ -45,7 +41,7 @@ public class MyTessOCR {
 
     public MyTessOCR(AssetManager assetManager,@Language String lang) {
 
-    Log.i(TAG, DATA_PATH);
+    CLog.i(TAG, DATA_PATH);
         this.assetManager = assetManager;
         this.lang = lang;
         String[] paths = new String[] { DATA_PATH, DATA_PATH + "tessdata/" };
@@ -54,10 +50,10 @@ public class MyTessOCR {
             File dir = new File(path);
             if (!dir.exists()) {
                 if (!dir.mkdirs()) {
-                    Log.v(TAG, "ERROR: Creation of directory " + path + " on sdcard failed");
+                    CLog.v(TAG, "ERROR: Creation of directory " + path + " on sdcard failed");
                     return;
                 } else {
-                    Log.v(TAG, "Created directory " + path + " on sdcard");
+                    CLog.v(TAG, "Created directory " + path + " on sdcard");
                 }
             }
         }
@@ -75,9 +71,9 @@ public class MyTessOCR {
                 in.close();
                 out.close();
 
-                Log.v(TAG, "Copied " + lang + " traineddata");
+                CLog.v(TAG, "Copied " + lang + " traineddata");
             } catch (IOException e) {
-                Log.e(TAG, "Was unable to copy " + lang + " traineddata " + e.toString());
+                CLog.e(TAG, "Was unable to copy " + lang + " traineddata " + e.toString());
             }
         }
 

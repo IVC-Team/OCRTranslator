@@ -58,26 +58,13 @@ public class SettingAdapter extends BaseAdapter {
             imgCheckbox.setVisibility ( View.VISIBLE );
         } else{
             imgCheckbox.setVisibility ( View.GONE );
+            rowView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    itemClickListener.onSelect ( lstSetting.get ( position ) );
+                }
+            });
         }
-
-        rowView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                itemClickListener.onSelect ( lstSetting.get ( position ) );
-//                DialogHelper.confirm ( context, context.getString( R.string.setting_message_confirm_change_start_mode), new DialogHelper.OnDialogListener () {
-//                    @Override
-//                    public void onAccept() {
-//                        for(Setting item : lstSetting){
-//                            item.setSet ( false );
-//                        }
-//                        lstSetting.get ( position ).setSet ( true );
-//                        Setting.saveScreenMode ( lstSetting.get ( position ).getTextSetting () );
-//                        notifyDataSetChanged ();
-//                    }
-//                } );
-
-            }
-        });
         return rowView;
     }
 

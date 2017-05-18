@@ -15,18 +15,18 @@ public class DialogHelper {
         AlertDialog.Builder b=new AlertDialog.Builder(context);
         b.setTitle ( context.getString( R.string.dialog_confirm_title) );
         b.setMessage ( message );
-        b.setPositiveButton( R.string.dialog_action_accept_title, new DialogInterface. OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which)
-            {
-                listener.onAccept ();
-            }
-        });
-        b.setNegativeButton (context.getString( R.string.dialog_action_dimiss_title), new DialogInterface. OnClickListener() {
+        b.setPositiveButton (context.getString( R.string.dialog_action_dimiss_title), new DialogInterface. OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which)
             {
                 dialog.dismiss ();
+            }
+        });
+        b.setNegativeButton ( R.string.dialog_action_accept_title, new DialogInterface. OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which)
+            {
+                listener.onAccept ();
             }
         });
         b.create().show();

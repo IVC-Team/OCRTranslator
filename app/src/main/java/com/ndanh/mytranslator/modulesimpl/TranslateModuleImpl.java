@@ -11,6 +11,7 @@ import com.ndanh.mytranslator.util.Config;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import retrofit2.Call;
@@ -35,9 +36,11 @@ public final class TranslateModuleImpl implements ITranslate {
     }
 
     @Override
-    public void translate(String src, String srclang, String destLang) {
+    public void translate(List<String> src, String srclang, String destLang) {
         Map<String, String> data = new HashMap<>();
-        data.put(Config.TRANSLATE_GCLOUD_QUERY, src);
+        for (String item : src) {
+            data.put(Config.TRANSLATE_GCLOUD_QUERY, item);
+        }
         data.put(Config.TRANSLATE_GCLOUD_SOURCE, srclang);
         data.put(Config.TRANSLATE_GCLOUD_TARGET, destLang);
         data.put(Config.TRANSLATE_GCLOUD_FORMAT, Config.TRANSLATE_GCLOUD_FORMAT_TYPE);
@@ -47,7 +50,7 @@ public final class TranslateModuleImpl implements ITranslate {
             public void onResponse(Call<TranslatorResponse> call, Response<TranslatorResponse> response) {
                 if(listener == null) return;
                 if(response.isSuccessful()) {
-                    listener.onSuccess( response.body().getData().getTranslations().get(0).getTranslatedText());
+                    listener.onSuccess(response.body());
                 }else {
                     listener.onFailed(mContext.getString( R.string.translate_module_fail_message));
                 }

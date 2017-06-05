@@ -3,8 +3,12 @@ package com.ndanh.mytranslator.modulesimpl;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
+import android.graphics.Rect;
+import android.util.Log;
 
+import com.googlecode.tesseract.android.PageIterator;
 import com.googlecode.tesseract.android.TessBaseAPI;
+import com.ndanh.mytranslator.model.DetectResult;
 import com.ndanh.mytranslator.services.IDetector;
 
 import java.io.File;
@@ -14,7 +18,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by ndanh on 4/18/2017.
@@ -42,22 +48,32 @@ public class TextDetextModuleImpl implements IDetector {
     @Override
     public void release() {
         callback = null;
+        mTess.end();
         mTess = null;
     }
 
     @Override
     public void setLanguage(String lang) {
         checkFile(new File(datapath + "tessdata/"), lang);
+        mTess.setPageSegMode(TessBaseAPI.OEM_TESSERACT_CUBE_COMBINED);
+        mTess.setPageSegMode(TessBaseAPI.PageSegMode.PSM_AUTO_OSD);
+        mTess.setPageSegMode(TessBaseAPI.PageSegMode.PSM_SINGLE_LINE);
         mTess.init(datapath, lang);
     }
 
     @Override
     public void detectBitmap(Bitmap bitmap) {
-        mTess.setImage(bitmap);
-        mTess.getUTF8Text();
-        if(callback != null){
-            callback.onSuccess ( new ArrayList<String> (  ) );
-        }
+//        mTess.setImage(bitmap);
+//        mTess.getUTF8Text();
+//        PageIterator iterator = mTess.getResultIterator();
+//        Map<Rect, String> result = new HashMap<Rect, String> ();
+//        while (iterator.next(TessBaseAPI.PageIteratorLevel.RIL_WORD)){
+//            result.put(iterator.getBoundingRect(TessBaseAPI.PageIteratorLevel.RIL_WORD))
+//        }
+
+//        if(callback != null){
+//            callback.onSuccess ( result);
+//        }
     }
 
     private void checkFile(File dir, String lang) {
@@ -104,12 +120,11 @@ public class TextDetextModuleImpl implements IDetector {
         }
     }
 
+    @Override
     public void setDetectBitmapCallback(DetectBitmapCallback callback){
         this.callback = callback;
     }
 
-    public interface DetectBitmapCallback{
-        void onSuccess(List<String> result);
-    }
+
 
 }

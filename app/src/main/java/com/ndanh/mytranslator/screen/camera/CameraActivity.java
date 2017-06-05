@@ -2,9 +2,19 @@ package com.ndanh.mytranslator.screen.camera;
 
 import android.Manifest;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.opengl.GLUtils;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
+import android.text.TextPaint;
+import android.text.TextUtils;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -22,7 +32,10 @@ import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import javax.microedition.khronos.opengles.GL10;
 
 public class CameraActivity extends NavigatorFooterActivity
         implements SurfaceHolder.Callback, CameraContract.ICameraView {
@@ -55,8 +68,11 @@ public class CameraActivity extends NavigatorFooterActivity
             matrix.postRotate(90);
             Bitmap rotatedBitmap = Bitmap.createBitmap(bmp , 0, 0, bmp .getWidth(), bmp .getHeight(), matrix, true);
             Bitmap scaledBitmap = Bitmap.createScaledBitmap(rotatedBitmap ,cameraView.getWidth (),cameraView.getHeight (),true);
+            drawTextToBitmap(scaledBitmap);
+            GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, scaledBitmap, 0);
             temp.setImageBitmap(scaledBitmap);
             temp.bringToFront ();
+            presenter.doTranslate(scaledBitmap.copy(scaledBitmap.getConfig(), true));
             refreshCamera();
             btnTakeButton.setClickable ( true );
         }
@@ -116,12 +132,17 @@ public class CameraActivity extends NavigatorFooterActivity
 
     @Override
     public Language.ELanguage getSrcLang() {
-        return null;
+        return Language.ELanguage.ENG;
     }
 
     @Override
     public Language.ELanguage getDestLang() {
-        return null;
+        return Language.ELanguage.JAP;
+    }
+
+    @Override
+    public void displayResult(List<String> result) {
+
     }
 
     //endregion
@@ -222,4 +243,73 @@ public class CameraActivity extends NavigatorFooterActivity
         }
     }
     //endregion
+
+    private void drawTextToBitmap(Bitmap bitmap) {
+        // TODO Auto-generated method stub
+
+
+        // get a canvas to paint over the bitmap
+        Canvas canvas = new Canvas(bitmap);
+        bitmap.eraseColor(android.graphics.Color.TRANSPARENT);
+
+        canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+
+
+
+        TextPaint textPaint = new TextPaint(TextPaint.ANTI_ALIAS_FLAG);
+        Paint paint = new Paint();
+        textPaint.setStyle(Paint.Style.FILL);
+        textPaint.setAntiAlias(true);
+        textPaint.setColor(Color.BLACK);
+        textPaint.setTextSize(10);
+
+        TextView tv = new TextView(getApplicationContext());
+        tv.setTextColor(Color.BLACK);
+        tv.setTextSize(10);
+
+        String text = "DEMO TEXT";
+
+        tv.setText(text);
+        tv.setEllipsize(TextUtils.TruncateAt.END);
+        tv.setMaxLines(4);
+        tv.setGravity(Gravity.BOTTOM);
+        tv.setPadding(8, 8, 8, 50);
+        tv.setDrawingCacheEnabled(true);
+        tv.measure(View.MeasureSpec.makeMeasureSpec(canvas.getWidth(),
+                View.MeasureSpec.EXACTLY), View.MeasureSpec.makeMeasureSpec(
+                canvas.getHeight(), View.MeasureSpec.EXACTLY));
+        tv.layout(0, 0, tv.getMeasuredWidth(), tv.getMeasuredHeight());
+
+
+
+        LinearLayout parent = null;
+        if (bitmap != null && !bitmap.isRecycled()) {
+            parent = new LinearLayout(getApplicationContext());
+
+            parent.setDrawingCacheEnabled(true);
+            parent.measure(View.MeasureSpec.makeMeasureSpec(canvas.getWidth(),
+                    View.MeasureSpec.EXACTLY), View.MeasureSpec.makeMeasureSpec(
+                    canvas.getHeight(), View.MeasureSpec.EXACTLY));
+            parent.layout(0, 0, parent.getMeasuredWidth(),
+                    parent.getMeasuredHeight());
+
+            parent.setLayoutParams(new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+            parent.setOrientation(LinearLayout.VERTICAL);
+
+            parent.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.transparent));
+
+
+            parent.addView(tv);
+
+        } else {
+            // write code to recreate bitmap from source
+            // Write code to show bitmap to canvas
+        }
+
+        canvas.drawBitmap(parent.getDrawingCache(), 0, 0, textPaint);
+
+        tv.setDrawingCacheEnabled(false);
+        parent.setDrawingCacheEnabled(false);
+    }
 }

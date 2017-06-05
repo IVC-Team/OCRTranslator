@@ -2,8 +2,13 @@ package com.ndanh.mytranslator.screen.voice;
 
 import com.ndanh.mytranslator.model.History;
 import com.ndanh.mytranslator.model.Language;
+import com.ndanh.mytranslator.modulesimpl.TranslateGCloud.Translation;
+import com.ndanh.mytranslator.modulesimpl.TranslateGCloud.TranslatorResponse;
 import com.ndanh.mytranslator.services.DAO.HistoryDao;
 import com.ndanh.mytranslator.services.ITranslate;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by ndanh on 4/28/2017.
@@ -42,14 +47,25 @@ public class VoiceTranslatorPresenter implements VoiceTranslatorContract.IVoiceT
 
     @Override
     public void doTranslate() {
-        mTranslate.translate(  mView.getTextSrc (), Language.getShortLanguage ( mView.getSrcLang() ),Language.getShortLanguage ( mView.getDestLang() ) );
+        List<String> src = new ArrayList<String>();
+        src.add( mView.getTextSrc ());
+        mTranslate.translate( src, Language.getShortLanguage ( mView.getSrcLang() ),Language.getShortLanguage ( mView.getDestLang() ) );
     }
 
     private ITranslate.OnTranslateListener translateListener = new ITranslate.OnTranslateListener() {
         @Override
-        public void onSuccess(String result) {
-            historyDao.addHistory ( new History ( Language.getLongLanguage (mView.getSrcLang ()), Language.getLongLanguage ( mView.getDestLang ()), mView.getTextSrc (), result) );
-            mView.displayResultTranslate(result);
+        public void onSuccess(TranslatorResponse result) {
+            String textTranslated = "";
+            for (Translation item : result.getData().getTranslations()) {
+                historyDao.addHistory ( new History (
+                        Language.getLongLanguage (mView.getSrcLang ()),
+                        Language.getLongLanguage ( mView.getDestLang ()),
+                        mView.getTextSrc (),
+                        item.getTranslatedText())
+                );
+                textTranslated += item.getTranslatedText() + "\n";
+            }
+            mView.displayResultTranslate(textTranslated);
         }
 
         @Override

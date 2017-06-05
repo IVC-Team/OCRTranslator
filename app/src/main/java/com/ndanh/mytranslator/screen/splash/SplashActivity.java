@@ -5,8 +5,11 @@ import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+import com.ndanh.mytranslator.App;
 import com.ndanh.mytranslator.R;
+import com.ndanh.mytranslator.model.Language;
 import com.ndanh.mytranslator.model.Setting;
+import com.ndanh.mytranslator.modulesimpl.ModuleManageImpl;
 import com.ndanh.mytranslator.screen.camera.CameraActivity;
 import com.ndanh.mytranslator.screen.history.HistoryActivity;
 import com.ndanh.mytranslator.screen.settings.SettingActivity;
@@ -27,6 +30,9 @@ public class SplashActivity extends AppCompatActivity {
 
         @Override
         protected void onPreExecute(){
+            ModuleManageImpl.init(SplashActivity.this);
+            Language.init ( SplashActivity.this );
+            Setting.initSetting ( SplashActivity.this );
         }
 
         @Override

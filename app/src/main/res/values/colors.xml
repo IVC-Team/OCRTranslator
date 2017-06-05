@@ -50,6 +50,7 @@
     <color name="colorBGNavigatorBar">#155770</color>
     <color name="colorBGNavigatorMenu">#222222</color>
     <color name="white">#FFFFFF</color>
+    <color name="colorBackground">#4B9FBF</color>
 
 
 </resources>

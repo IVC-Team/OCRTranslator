@@ -10,6 +10,7 @@ import com.ndanh.mytranslator.screen.about.AboutActivity;
 import com.ndanh.mytranslator.screen.camera.CameraActivity;
 import com.ndanh.mytranslator.screen.help.HelpActivity;
 import com.ndanh.mytranslator.screen.history.HistoryActivity;
+import com.ndanh.mytranslator.screen.privacypolicy.PrivacyPolicyActivity;
 import com.ndanh.mytranslator.screen.settings.SettingActivity;
 import com.ndanh.mytranslator.screen.text.TextTranslatorActivity;
 import com.ndanh.mytranslator.screen.voice.VoiceTranslatorActivity;

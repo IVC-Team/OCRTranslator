@@ -47,16 +47,14 @@ public final class TranslateModuleImpl implements ITranslate {
             public void onResponse(Call<TranslatorResponse> call, Response<TranslatorResponse> response) {
                 if(listener == null) return;
                 if(response.isSuccessful()) {
-                    listener.onSuccess(response.body().getData().getTranslations().get(0).getTranslatedText());
+                    listener.onSuccess( response.body().getData().getTranslations().get(0).getTranslatedText());
                 }else {
-//                    String.valueOf(response.code())
                     listener.onFailed(mContext.getString( R.string.translate_module_fail_message));
                 }
             }
 
             @Override
             public void onFailure(Call<TranslatorResponse> call, Throwable t) {
-//                String.valueOf(t.getMessage());
                 if(listener == null) return;
                 listener.onFailed(mContext.getString( R.string.translate_module_fail_message));
             }

@@ -15,9 +15,6 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        ModuleManageImpl.init(App.this);
-        Language.init ( App.this );
-        Setting.initSetting ( App.this );
     }
 
     @Override

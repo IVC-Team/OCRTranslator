@@ -246,7 +246,7 @@ public class VoiceTranslatorActivity extends NavigatorFooterActivity implements 
 
     @Override
     public String getTextSrc() {
-        return textTranslate.getText ().toString ();
+        return textSource.getText ().toString ();
     }
 
     //private methods

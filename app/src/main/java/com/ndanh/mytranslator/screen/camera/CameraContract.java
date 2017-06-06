@@ -17,7 +17,7 @@ public interface CameraContract {
     interface ICameraView extends BaseView<ICameraPresenter>{
         Language.ELanguage getSrcLang();
         Language.ELanguage getDestLang();
-        void displayResult(List<DetectResult> result);
+        void displayResult(List<DetectResult> result, int width, int height);
     }
     interface ICameraPresenter extends BasePresenter{
         void doTranslate(Bitmap bitmap);

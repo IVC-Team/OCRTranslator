@@ -38,6 +38,7 @@ public class DetectResult {
 
     @Override
     public String toString() {
+        this.text.replace(">","");
         return DetectResult.parseRect2String(this.getPosition ()) + this.text ;
     }
 

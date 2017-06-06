@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.text.TextPaint;
@@ -66,7 +67,7 @@ public class CameraActivity extends NavigatorFooterActivity
             Matrix matrix = new Matrix();
             matrix.postRotate(90);
             Bitmap rotatedBitmap = Bitmap.createBitmap(bmp , 0, 0, bmp .getWidth(), bmp .getHeight(), matrix, true);
-            Bitmap scaledBitmap = Bitmap.createScaledBitmap(rotatedBitmap ,cameraView.getWidth (),cameraView.getHeight (),true);
+            Bitmap scaledBitmap = Bitmap.createScaledBitmap(rotatedBitmap ,cameraView.getWidth ()/2,cameraView.getHeight ()/2,true);
 
 //            drawTextToBitmap(scaledBitmap);
 //            GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, scaledBitmap, 0);
@@ -143,15 +144,17 @@ public class CameraActivity extends NavigatorFooterActivity
     }
 
     @Override
-    public void displayResult(List<DetectResult> result) {
+    public void displayResult(List<DetectResult> result, int width, int height) {
 
 //        arMask.setImageBitmap ( result );
         Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
         Paint paint = new Paint();
-        paint.setColor(color);
+        paint.setColor(ContextCompat.getColor( getApplicationContext() ,R.color.transparent));
         canvas.drawRect(0F, 0F, (float) width, (float) height, paint);
-        return bitmap;
+
+        drawTextToBitmap(bitmap , result);
+        arMask.setImageBitmap ( bitmap );
         arMask.bringToFront ();
     }
 
@@ -208,11 +211,15 @@ public class CameraActivity extends NavigatorFooterActivity
             List<Camera.Size> pictureSizes = param.getSupportedPictureSizes ();
             param.setPreviewSize(previewSizes.get(0).width, previewSizes.get(0).height);
             param.setPictureSize ( previewSizes.get(0).width, previewSizes.get(0).height );
-            camera.setParameters(param);
-            param = camera.getParameters();
+
             param.getPictureSize ();
             param.getPreviewSize ();
+            if (param.getSupportedFocusModes().contains(
+                    Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)) {
+                param.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
+            }
             camera.setDisplayOrientation(90);
+            camera.setParameters(param);
             try
             {
                 camera.setPreviewDisplay(surfaceHolder);
@@ -254,72 +261,40 @@ public class CameraActivity extends NavigatorFooterActivity
     }
     //endregion
 
-    private void drawTextToBitmap(Bitmap bitmap) {
-        // TODO Auto-generated method stub
-
-
-        // get a canvas to paint over the bitmap
+    private void drawTextToBitmap(Bitmap bitmap, List<DetectResult> result) {
         Canvas canvas = new Canvas(bitmap);
-        bitmap.eraseColor(android.graphics.Color.TRANSPARENT);
+        Canvas canvas1;
+//        bitmap.eraseColor(android.graphics.Color.TRANSPARENT);
+//        canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
 
-        canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
-
-
-
-        TextPaint textPaint = new TextPaint(TextPaint.ANTI_ALIAS_FLAG);
         Paint paint = new Paint();
-        textPaint.setStyle(Paint.Style.FILL);
-        textPaint.setAntiAlias(true);
-        textPaint.setColor(Color.BLACK);
-        textPaint.setTextSize(10);
-
-        TextView tv = new TextView(getApplicationContext());
-        tv.setTextColor(Color.BLACK);
-        tv.setTextSize(10);
-
-        String text = "DEMO TEXT";
-
-        tv.setText(text);
-        tv.setEllipsize(TextUtils.TruncateAt.END);
-        tv.setMaxLines(4);
-        tv.setGravity(Gravity.BOTTOM);
-        tv.setPadding(8, 8, 8, 50);
-        tv.setDrawingCacheEnabled(true);
-        tv.measure(View.MeasureSpec.makeMeasureSpec(canvas.getWidth(),
-                View.MeasureSpec.EXACTLY), View.MeasureSpec.makeMeasureSpec(
-                canvas.getHeight(), View.MeasureSpec.EXACTLY));
-        tv.layout(0, 0, tv.getMeasuredWidth(), tv.getMeasuredHeight());
+        paint.setTypeface(Typeface.DEFAULT);
 
 
+        paint.setColor(Color.WHITE);
 
-        LinearLayout parent = null;
-        if (bitmap != null && !bitmap.isRecycled()) {
-            parent = new LinearLayout(getApplicationContext());
+        Bitmap bm;
 
-            parent.setDrawingCacheEnabled(true);
-            parent.measure(View.MeasureSpec.makeMeasureSpec(canvas.getWidth(),
-                    View.MeasureSpec.EXACTLY), View.MeasureSpec.makeMeasureSpec(
-                    canvas.getHeight(), View.MeasureSpec.EXACTLY));
-            parent.layout(0, 0, parent.getMeasuredWidth(),
-                    parent.getMeasuredHeight());
-
-            parent.setLayoutParams(new LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-            parent.setOrientation(LinearLayout.VERTICAL);
-
-            parent.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.transparent));
-
-
-            parent.addView(tv);
-
-        } else {
-            // write code to recreate bitmap from source
-            // Write code to show bitmap to canvas
+        for (DetectResult item: result) {
+            int textSize = determineMaxTextSize(item.getText() , item.getPosition().width());
+            paint.setTextSize(textSize);
+            float textWidth = paint.measureText(item.getText() );
+            bm = Bitmap.createBitmap((int)textWidth, textSize, Bitmap.Config.ARGB_8888);
+            canvas1 = new Canvas(bm);
+            canvas1.drawText(item.getText() , 0,0 ,paint);
+            canvas.drawBitmap(bm,  null,item.getPosition(),null);
         }
+    }
 
-        canvas.drawBitmap(parent.getDrawingCache(), 0, 0, textPaint);
+    private int determineMaxTextSize(String str, float maxWidth)
+    {
+        int size = 0;
+        Paint paint = new Paint();
 
-        tv.setDrawingCacheEnabled(false);
-        parent.setDrawingCacheEnabled(false);
+        do {
+            paint.setTextSize(++ size);
+        } while(paint.measureText(str) < maxWidth);
+
+        return size;
     }
 }

@@ -38,7 +38,7 @@ public class CameraPresenter implements CameraContract.ICameraPresenter {
     private IDetector mDetector;
     private ITranslate mTranslate;
     private static final String TAG = "CameraPresenter";
-
+    private int width, height;
     private CameraContract.ICameraView mView;
 
     public CameraPresenter(CameraContract.ICameraView view, IDetector detector, ITranslate translate){
@@ -54,7 +54,7 @@ public class CameraPresenter implements CameraContract.ICameraPresenter {
                     detectResults.add ( DetectResult.parseDetectResult ( item.getTranslatedText () ) );
                 }
 
-                mView.displayResult(detectResults);
+                mView.displayResult(detectResults, width, height);
             }
 
             @Override
@@ -92,6 +92,8 @@ public class CameraPresenter implements CameraContract.ICameraPresenter {
 
     @Override
     public void doTranslate(Bitmap bitmap) {
+        width = bitmap.getWidth();
+        height = bitmap.getHeight();
         mDetector.detectBitmap(bitmap);
     }
 

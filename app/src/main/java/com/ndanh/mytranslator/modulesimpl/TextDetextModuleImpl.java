@@ -66,8 +66,8 @@ public class TextDetextModuleImpl implements IDetector {
 
     @Override
     public void detectBitmap(Bitmap bitmap) {
-        Bitmap bm = BitmapFactory.decodeResource ( mContext.getResources (), R.drawable.capture );
-        mTess.setImage(bm);
+//        Bitmap bm = BitmapFactory.decodeResource ( mContext.getResources (), R.drawable.capture );
+        mTess.setImage(bitmap);
         mTess.getUTF8Text();
         ResultIterator iterator = mTess.getResultIterator ();
         List<DetectResult> result = new ArrayList<DetectResult> ();

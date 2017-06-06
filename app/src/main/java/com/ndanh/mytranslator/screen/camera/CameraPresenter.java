@@ -16,7 +16,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.ndanh.mytranslator.R;
+import com.ndanh.mytranslator.model.DetectResult;
 import com.ndanh.mytranslator.model.Language;
+import com.ndanh.mytranslator.modulesimpl.TranslateGCloud.Translation;
 import com.ndanh.mytranslator.modulesimpl.TranslateGCloud.TranslatorResponse;
 import com.ndanh.mytranslator.services.IDetector;
 import com.ndanh.mytranslator.services.ITranslate;
@@ -47,8 +49,12 @@ public class CameraPresenter implements CameraContract.ICameraPresenter {
         mTranslate.setOnTranslateListener(new ITranslate.OnTranslateListener() {
             @Override
             public void onSuccess(TranslatorResponse result) {
-                List<String> lst = new ArrayList<String>();
-                mView.displayResult(lst);
+                List<DetectResult> detectResults = new ArrayList<DetectResult> (  );
+                for (Translation item : result.getData ().getTranslations ()) {
+                    detectResults.add ( DetectResult.parseDetectResult ( item.getTranslatedText () ) );
+                }
+
+                mView.displayResult(detectResults);
             }
 
             @Override
@@ -56,14 +62,17 @@ public class CameraPresenter implements CameraContract.ICameraPresenter {
 
             }
         });
-        mDetector.setDetectBitmapCallback(new IDetector.DetectBitmapCallback() {
+        mDetector.setDetectBitmapCallback ( new IDetector.DetectBitmapCallback () {
             @Override
-                public void onSuccess(Map<Rect,String> result) {
-//                    mTranslate.translate(result,
-//                            Language.getShortLanguage ( mView.getSrcLang() ),
-//                            Language.getShortLanguage ( mView.getDestLang() ) );
+            public void onSuccess(List<DetectResult> result) {
+                List<String> srcString = new ArrayList<String> (  );
+                for (DetectResult item : result) {
+                    srcString.add ( item.toString () );
                 }
-        });
+                mTranslate.translate(srcString, Language.getShortLanguage ( mView.getSrcLang() ),Language.getShortLanguage ( mView.getDestLang() ) );
+            }
+        } );
+        mDetector.setLanguage ( "eng" );
     }
 
     @Override

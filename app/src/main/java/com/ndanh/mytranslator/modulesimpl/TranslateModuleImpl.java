@@ -1,6 +1,7 @@
 package com.ndanh.mytranslator.modulesimpl;
 
 import android.content.Context;
+import android.support.annotation.StringRes;
 
 import com.ndanh.mytranslator.R;
 import com.ndanh.mytranslator.modulesimpl.TranslateGCloud.ApiUtils;
@@ -10,6 +11,7 @@ import com.ndanh.mytranslator.services.ITranslate;
 import com.ndanh.mytranslator.util.Config;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,15 +39,13 @@ public final class TranslateModuleImpl implements ITranslate {
 
     @Override
     public void translate(List<String> src, String srclang, String destLang) {
+
         Map<String, String> data = new HashMap<>();
-        for (String item : src) {
-            data.put(Config.TRANSLATE_GCLOUD_QUERY, item);
-        }
         data.put(Config.TRANSLATE_GCLOUD_SOURCE, srclang);
         data.put(Config.TRANSLATE_GCLOUD_TARGET, destLang);
         data.put(Config.TRANSLATE_GCLOUD_FORMAT, Config.TRANSLATE_GCLOUD_FORMAT_TYPE);
         data.put(Config.TRANSLATE_GCLOUD_KEY, Config.TRANSLATE_GCLOUD_API_KEY);
-        translateService.getTranslateResult(data).enqueue(new Callback<TranslatorResponse>() {
+        translateService.getTranslateResult(src, data).enqueue(new Callback<TranslatorResponse>() {
             @Override
             public void onResponse(Call<TranslatorResponse> call, Response<TranslatorResponse> response) {
                 if(listener == null) return;

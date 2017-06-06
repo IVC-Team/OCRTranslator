@@ -1,5 +1,9 @@
 package com.ndanh.mytranslator;
 
+import android.graphics.Rect;
+
+import com.ndanh.mytranslator.model.DetectResult;
+
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -12,6 +16,14 @@ import static org.junit.Assert.*;
 public class ExampleUnitTest {
     @Test
     public void addition_isCorrect() throws Exception {
-        assertEquals(4, 2 + 2);
+        assertEquals(4, 1 + 2);
+    }
+
+    @Test
+    public void parseRect() throws Exception {
+
+        DetectResult item = DetectResult.parseDetectResult("<1-2-1-1>a");
+
+        assertEquals(item.getText (), "a");
     }
 }

@@ -18,6 +18,6 @@ public interface IDetector {
     void setLanguage(String lang);
     void setDetectBitmapCallback(DetectBitmapCallback callback);
     interface DetectBitmapCallback{
-        void onSuccess(Map<Rect, String> result);
+        void onSuccess(List<DetectResult> result);
     }
 }

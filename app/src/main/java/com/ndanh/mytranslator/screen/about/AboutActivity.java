@@ -6,12 +6,13 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.ndanh.mytranslator.R;
+import com.ndanh.mytranslator.base.BaseActivity;
 import com.ndanh.mytranslator.screen.privacypolicy.PrivacyPolicyActivity;
 
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class AboutActivity extends AppCompatActivity {
+public class AboutActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

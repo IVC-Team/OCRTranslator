@@ -27,14 +27,55 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"/>
         </RelativeLayout>
+    <RelativeLayout
+        android:id="@+id/micro_background"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:background="@drawable/circle"
+        android:layout_above="@+id/panel_change_language">
         <ImageView
             android:id="@+id/btn_takeButton"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:src="@drawable/camera"
             android:onClick="captureImage"
-            android:layout_alignParentBottom="true"
+            android:scaleX="0.6"
+            android:scaleY="0.6"
             android:layout_centerHorizontal="true"/>
+    </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/panel_change_language"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true">
+            <Button
+                android:id="@+id/action_choose_source"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:textColor="@color/colorTextWhite"
+                android:textAllCaps="false"/>
+            <ImageView
+                android:id="@+id/action_change"
+                android:layout_width="@dimen/normal_icon_width"
+                android:layout_height="@dimen/normal_icon_height"
+                android:padding="@dimen/increase_area_clickable"
+                android:src="@drawable/two_way_arrow"/>
+
+            <Button
+                android:id="@+id/action_choose_dest"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:textColor="@color/colorTextWhite"
+                android:textAllCaps="false"/>
+        </LinearLayout>
     </RelativeLayout>
 
     <LinearLayout

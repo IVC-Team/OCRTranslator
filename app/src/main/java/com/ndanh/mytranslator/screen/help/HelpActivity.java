@@ -4,8 +4,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import com.ndanh.mytranslator.R;
+import com.ndanh.mytranslator.base.BaseActivity;
 
-public class HelpActivity extends AppCompatActivity {
+public class HelpActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -11,6 +11,7 @@ import android.widget.ListView;
 
 import com.ndanh.mytranslator.R;
 import com.ndanh.mytranslator.adapter.SettingAdapter;
+import com.ndanh.mytranslator.base.BaseActivity;
 import com.ndanh.mytranslator.model.Setting;
 import com.ndanh.mytranslator.screen.splash.SplashActivity;
 import com.ndanh.mytranslator.screen.text.TextTranslatorActivity;
@@ -26,7 +27,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class SettingActivity extends AppCompatActivity implements SettingAdapter.OnItemClickListener {
+public class SettingActivity extends BaseActivity implements SettingAdapter.OnItemClickListener {
     @BindView ( R.id.lst_settings )
     ListView lstSetting;
     private SettingAdapter adapter;

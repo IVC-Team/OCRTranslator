@@ -7,12 +7,17 @@ import android.graphics.BitmapFactory;
 import android.graphics.Rect;
 import android.util.Log;
 
+import com.googlecode.leptonica.android.Binarize;
+import com.googlecode.leptonica.android.Pix;
+import com.googlecode.leptonica.android.ReadFile;
 import com.googlecode.tesseract.android.PageIterator;
 import com.googlecode.tesseract.android.ResultIterator;
 import com.googlecode.tesseract.android.TessBaseAPI;
 import com.ndanh.mytranslator.R;
 import com.ndanh.mytranslator.model.DetectResult;
 import com.ndanh.mytranslator.services.IDetector;
+import com.ndanh.mytranslator.util.CLog;
+import com.ndanh.mytranslator.util.CToast;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -38,9 +43,8 @@ public class TextDetextModuleImpl implements IDetector {
 
     public TextDetextModuleImpl(Context context) {
         this.mContext = context;
-
         datapath = context.getFilesDir()+ "/tesseract/";
-        mTess = new TessBaseAPI();
+
 
     }
 
@@ -58,6 +62,7 @@ public class TextDetextModuleImpl implements IDetector {
     @Override
     public void setLanguage(String lang) {
         checkFile(new File(datapath + "tessdata/"), lang);
+        mTess = new TessBaseAPI();
         mTess.setPageSegMode(TessBaseAPI.OEM_TESSERACT_CUBE_COMBINED);
         mTess.setPageSegMode(TessBaseAPI.PageSegMode.PSM_AUTO_OSD);
         mTess.setPageSegMode(TessBaseAPI.PageSegMode.PSM_SINGLE_LINE);
@@ -66,13 +71,23 @@ public class TextDetextModuleImpl implements IDetector {
 
     @Override
     public void detectBitmap(Bitmap bitmap) {
-//        Bitmap bm = BitmapFactory.decodeResource ( mContext.getResources (), R.drawable.capture );
-        mTess.setImage(bitmap);
+        CToast.showMessage ( "Start detect bitmap" );
+        Pix temp = ReadFile.readBitmap ( bitmap );
+        temp = Binarize.sauvolaBinarizeTiled ( temp );
+
+        mTess.setImage(temp);
+        long time = System.currentTimeMillis ();
+
+
+//        mTess.setImage(bitmap);
         mTess.getUTF8Text();
+
+
         ResultIterator iterator = mTess.getResultIterator ();
         List<DetectResult> result = new ArrayList<DetectResult> ();
         DetectResult item = new DetectResult ();
         while (iterator.next(TessBaseAPI.PageIteratorLevel.RIL_WORD)){
+            if(iterator.confidence ( TessBaseAPI.PageIteratorLevel.RIL_WORD ) < 80) continue;
             if(checkPosition ( item ,iterator.getBoundingRect ( TessBaseAPI.PageIteratorLevel.RIL_WORD ))){
                 item.mergeText (iterator.getUTF8Text ( TessBaseAPI.PageIteratorLevel.RIL_WORD ) );
                 item.mergePosition (iterator.getBoundingRect ( TessBaseAPI.PageIteratorLevel.RIL_WORD ));
@@ -83,11 +98,13 @@ public class TextDetextModuleImpl implements IDetector {
                 result.add ( item );
             }
         }
-
+        long time1 = System.currentTimeMillis ();
         if(callback != null){
+            CToast.showMessage ( "End detect " + (time1 - time));
             callback.onSuccess ( result);
         }
     }
+
 
     private void checkFile(File dir, String lang) {
         if (!dir.exists()&& dir.mkdirs()){
@@ -101,6 +118,7 @@ public class TextDetextModuleImpl implements IDetector {
                 copyFiles(lang);
             }
         }
+
     }
 
     private void copyFiles(String lang) {
@@ -153,6 +171,4 @@ public class TextDetextModuleImpl implements IDetector {
         if(distance > average) return false;
         return true;
     }
-
-
 }

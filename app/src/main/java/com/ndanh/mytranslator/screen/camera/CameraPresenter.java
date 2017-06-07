@@ -22,6 +22,7 @@ import com.ndanh.mytranslator.modulesimpl.TranslateGCloud.Translation;
 import com.ndanh.mytranslator.modulesimpl.TranslateGCloud.TranslatorResponse;
 import com.ndanh.mytranslator.services.IDetector;
 import com.ndanh.mytranslator.services.ITranslate;
+import com.ndanh.mytranslator.util.CToast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,25 +47,30 @@ public class CameraPresenter implements CameraContract.ICameraPresenter {
         this.mDetector = detector;
         this.mTranslate = translate;
         mView.setPresenter(this);
+    }
+
+    @Override
+    public void start() {
         mTranslate.setOnTranslateListener(new ITranslate.OnTranslateListener() {
             @Override
             public void onSuccess(TranslatorResponse result) {
+                mView.showMessage ( "CameraPresenter ITranslate onSuccess" );
                 List<DetectResult> detectResults = new ArrayList<DetectResult> (  );
                 for (Translation item : result.getData ().getTranslations ()) {
                     detectResults.add ( DetectResult.parseDetectResult ( item.getTranslatedText () ) );
                 }
-
                 mView.displayResult(detectResults, width, height);
             }
 
             @Override
             public void onFailed(String msg) {
-
+                CToast.showMessage ( msg );
             }
         });
         mDetector.setDetectBitmapCallback ( new IDetector.DetectBitmapCallback () {
             @Override
             public void onSuccess(List<DetectResult> result) {
+                mView.showMessage ( "CameraPresenter DetectBitmapCallback onSuccess" );
                 List<String> srcString = new ArrayList<String> (  );
                 for (DetectResult item : result) {
                     srcString.add ( item.toString () );
@@ -72,12 +78,6 @@ public class CameraPresenter implements CameraContract.ICameraPresenter {
                 mTranslate.translate(srcString, Language.getShortLanguage ( mView.getSrcLang() ),Language.getShortLanguage ( mView.getDestLang() ) );
             }
         } );
-        mDetector.setLanguage ( "eng" );
-    }
-
-    @Override
-    public void start() {
-
     }
 
     @Override
@@ -97,9 +97,8 @@ public class CameraPresenter implements CameraContract.ICameraPresenter {
         mDetector.detectBitmap(bitmap);
     }
 
-
-
-
-
-
+    @Override
+    public void changeSrcLanguage() {
+        mDetector.setLanguage ( Language.getShortLanguage ( mView.getSrcLang() ) );
+    }
 }

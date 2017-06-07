@@ -6,12 +6,13 @@ import android.view.View;
 import android.webkit.WebView;
 
 import com.ndanh.mytranslator.R;
+import com.ndanh.mytranslator.base.BaseActivity;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class PrivacyPolicyActivity extends AppCompatActivity {
+public class PrivacyPolicyActivity extends BaseActivity {
     @BindView ( R.id.webview )
     WebView webView;
     @Override

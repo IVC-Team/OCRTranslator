@@ -18,8 +18,10 @@ public interface CameraContract {
         Language.ELanguage getSrcLang();
         Language.ELanguage getDestLang();
         void displayResult(List<DetectResult> result, int width, int height);
+        void showMessage(String msg);
     }
     interface ICameraPresenter extends BasePresenter{
         void doTranslate(Bitmap bitmap);
+        void changeSrcLanguage();
     }
 }

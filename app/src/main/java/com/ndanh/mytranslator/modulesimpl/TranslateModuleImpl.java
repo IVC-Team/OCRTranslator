@@ -8,6 +8,7 @@ import com.ndanh.mytranslator.modulesimpl.TranslateGCloud.ApiUtils;
 import com.ndanh.mytranslator.modulesimpl.TranslateGCloud.TranslateService;
 import com.ndanh.mytranslator.modulesimpl.TranslateGCloud.TranslatorResponse;
 import com.ndanh.mytranslator.services.ITranslate;
+import com.ndanh.mytranslator.util.CToast;
 import com.ndanh.mytranslator.util.Config;
 
 import java.io.IOException;
@@ -40,6 +41,7 @@ public final class TranslateModuleImpl implements ITranslate {
     @Override
     public void translate(List<String> src, String srclang, String destLang) {
 
+        CToast.showMessage ( "Start translate... " );
         Map<String, String> data = new HashMap<>();
         data.put(Config.TRANSLATE_GCLOUD_SOURCE, srclang);
         data.put(Config.TRANSLATE_GCLOUD_TARGET, destLang);
@@ -50,8 +52,10 @@ public final class TranslateModuleImpl implements ITranslate {
             public void onResponse(Call<TranslatorResponse> call, Response<TranslatorResponse> response) {
                 if(listener == null) return;
                 if(response.isSuccessful()) {
+                    CToast.showMessage ( "Fisnish translate... " );
                     listener.onSuccess(response.body());
                 }else {
+
                     listener.onFailed(mContext.getString( R.string.translate_module_fail_message));
                 }
             }

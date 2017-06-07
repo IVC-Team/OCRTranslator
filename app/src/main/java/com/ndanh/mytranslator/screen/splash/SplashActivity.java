@@ -7,6 +7,7 @@ import android.os.Bundle;
 
 import com.ndanh.mytranslator.App;
 import com.ndanh.mytranslator.R;
+import com.ndanh.mytranslator.base.BaseActivity;
 import com.ndanh.mytranslator.model.Language;
 import com.ndanh.mytranslator.model.Setting;
 import com.ndanh.mytranslator.modulesimpl.ModuleManageImpl;
@@ -17,7 +18,7 @@ import com.ndanh.mytranslator.screen.text.TextTranslatorActivity;
 import com.ndanh.mytranslator.screen.voice.VoiceTranslatorActivity;
 
 
-public class SplashActivity extends AppCompatActivity {
+public class SplashActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

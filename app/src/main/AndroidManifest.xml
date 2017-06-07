@@ -24,7 +24,6 @@
             android:name=".screen.text.TextTranslatorActivity"
             android:windowSoftInputMode="adjustResize"
             android:screenOrientation="portrait">
-
         </activity>
         <activity android:name=".screen.voice.VoiceTranslatorActivity"
                   android:screenOrientation="portrait">
@@ -49,11 +48,6 @@
         </activity>
         <activity android:name=".screen.settings.SettingActivity"
                   android:screenOrientation="portrait">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
         </activity>
         <activity android:name=".screen.about.AboutActivity"
                   android:screenOrientation="portrait">

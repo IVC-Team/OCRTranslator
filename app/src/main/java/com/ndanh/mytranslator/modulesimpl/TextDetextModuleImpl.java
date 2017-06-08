@@ -3,6 +3,7 @@ package com.ndanh.mytranslator.modulesimpl;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Rect;
 import com.googlecode.leptonica.android.Binarize;
 import com.googlecode.leptonica.android.Pix;
@@ -46,7 +47,6 @@ public class TextDetextModuleImpl implements IDetector {
     @Override
     public void release() {
         callback = null;
-        mTess.end();
         mTess = null;
     }
 
@@ -54,28 +54,19 @@ public class TextDetextModuleImpl implements IDetector {
     public void setLanguage(String lang) {
         checkFile(new File(datapath + "tessdata/"), lang);
         mTess = new TessBaseAPI();
-        mTess.setPageSegMode(TessBaseAPI.OEM_TESSERACT_CUBE_COMBINED);
-        mTess.setPageSegMode(TessBaseAPI.PageSegMode.PSM_AUTO_OSD);
-        mTess.setPageSegMode(TessBaseAPI.PageSegMode.PSM_SINGLE_LINE);
         mTess.init(datapath, lang);
     }
 
     @Override
     public void detectBitmap(Bitmap bitmap) {
-        Pix temp = ReadFile.readBitmap ( bitmap );
-        temp = Binarize.sauvolaBinarizeTiled ( temp );
-
-        mTess.setImage( WriteFile.writeBitmap ( temp ));
-
+        mTess.setImage ( bitmap );
         mTess.getUTF8Text();
-
-
         ResultIterator iterator = mTess.getResultIterator ();
         List<DetectResult> result = new ArrayList<DetectResult> ();
         DetectResult item = new DetectResult ();
         while (iterator.next(TessBaseAPI.PageIteratorLevel.RIL_WORD)){
             if(iterator.confidence ( TessBaseAPI.PageIteratorLevel.RIL_WORD ) < 80) continue;
-            if(iterator.getUTF8Text ( TessBaseAPI.PageIteratorLevel.RIL_WORD ) == "1")
+            if(iterator.getUTF8Text ( TessBaseAPI.PageIteratorLevel.RIL_WORD ) == "1")continue;
             if(checkPosition ( item ,iterator.getBoundingRect ( TessBaseAPI.PageIteratorLevel.RIL_WORD ))){
                 item.mergeText (iterator.getUTF8Text ( TessBaseAPI.PageIteratorLevel.RIL_WORD ) );
                 item.mergePosition (iterator.getBoundingRect ( TessBaseAPI.PageIteratorLevel.RIL_WORD ));
@@ -86,7 +77,6 @@ public class TextDetextModuleImpl implements IDetector {
                 result.add ( item );
             }
         }
-        mTess.end ();
         if(callback != null){
             callback.onSuccess ( result);
         }

@@ -84,7 +84,7 @@ public class CameraActivity extends NavigatorFooterActivity
             matrix.postRotate(orientation);
             Bitmap rotatedBitmap = Bitmap.createBitmap(bmp , 0, 0, bmp .getWidth(), bmp .getHeight(), matrix, true);
             Bitmap scaledBitmap = Bitmap.createScaledBitmap(rotatedBitmap ,cameraView.getWidth (),cameraView.getHeight (),true);
-            presenter.doTranslate(scaledBitmap.copy(scaledBitmap.getConfig(), true));
+            presenter.doTranslate(scaledBitmap);
         }
     };
     //endregion

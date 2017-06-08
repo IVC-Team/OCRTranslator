@@ -13,6 +13,8 @@ import com.ndanh.mytranslator.adapter.HistoryRecyclerViewApdater;
 import com.ndanh.mytranslator.base.BaseActivity;
 import com.ndanh.mytranslator.model.History;
 import com.ndanh.mytranslator.modulesimpl.HistoryDaoImp;
+import com.ndanh.mytranslator.util.DialogHelper;
+import com.ndanh.mytranslator.util.SimpleSQLiteOpenHelper;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -43,7 +45,7 @@ public class HistoryActivity extends BaseActivity implements HistoryContract.IHi
         DeleteMode.getInstance ().addObserver ( HistoryActivity.this );
     }
 
-    private void initView(){
+    public void initView(){
         adapter = new HistoryRecyclerViewApdater(getApplicationContext());
         adapter.addItems ( new ArrayList<HistoryRecyclerViewApdater.HistoryView> (  ) );
         deleteProcessListener = adapter;
@@ -104,6 +106,15 @@ public class HistoryActivity extends BaseActivity implements HistoryContract.IHi
 
     @OnClick(R.id.garbage)
     public void doDelete(View v){
+        DialogHelper.confirm ( HistoryActivity.this, getString( R.string.history_message_confirm_delete_history), new DialogHelper.OnDialogListener () {
+            @Override
+            public void onAccept() {
+                deleteHistory();
+            }
+        } );
+    }
+
+    private void deleteHistory(){
         long[] lstDelete = deleteProcessListener.beforeDelete();
         this.presenter.deleteHistory ( lstDelete );
         DeleteMode.getInstance ().off ();

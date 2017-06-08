@@ -9,6 +9,11 @@ import com.ndanh.mytranslator.base.BaseActivity;
 public class HelpActivity extends BaseActivity {
 
     @Override
+    protected void initView() {
+
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate ( savedInstanceState );
         setContentView ( R.layout.activity_help );

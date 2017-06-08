@@ -14,7 +14,7 @@ import static android.speech.SpeechRecognizer.createSpeechRecognizer;
 public final class VoiceDetectModuleImpl implements IVoiceDetect {
     private SpeechRecognizer voiceRecognize;
     private Context mContext;
-    public VoiceDetectModuleImpl(Context context) {
+    public VoiceDetectModuleImpl(final Context context) {
         this.mContext = context;
         voiceRecognize = createSpeechRecognizer(context);
     }

@@ -24,14 +24,14 @@ import android.widget.ToggleButton;
 import com.ndanh.mytranslator.R;
 import com.ndanh.mytranslator.base.NavigatorFooterActivity;
 import com.ndanh.mytranslator.model.Language;
-import com.ndanh.mytranslator.modulesimpl.HistoryDaoImp;
-import com.ndanh.mytranslator.modulesimpl.ModuleManageImpl;
 import com.ndanh.mytranslator.util.CLog;
 import com.ndanh.mytranslator.util.PermissionHelper;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+
+import static android.speech.SpeechRecognizer.createSpeechRecognizer;
 
 public class VoiceTranslatorActivity extends NavigatorFooterActivity implements VoiceTranslatorContract.IVoiceTranslatorView {
 
@@ -293,7 +293,7 @@ public class VoiceTranslatorActivity extends NavigatorFooterActivity implements 
         }
     }
 
-    private void initView() {
+    public void initView() {
         srcLang = Language.ELanguage.ENG;
         destLang = Language.ELanguage.JAP;
 
@@ -308,7 +308,7 @@ public class VoiceTranslatorActivity extends NavigatorFooterActivity implements 
         if(speech != null) return;
 
         setRecognizeIntent ();
-        speech = SpeechRecognizer.createSpeechRecognizer(this);
+        speech = createSpeechRecognizer(this);
         speech.setRecognitionListener(recognitionListener);
 
     }

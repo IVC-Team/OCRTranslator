@@ -76,7 +76,6 @@ public class CameraPresenter implements CameraContract.ICameraPresenter {
     public void pause() {
         this.mDetector = null;
         this.mTranslate = null;
-        ModuleManageImpl.pause ();
     }
 
     @Override

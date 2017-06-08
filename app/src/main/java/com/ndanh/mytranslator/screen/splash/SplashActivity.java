@@ -21,6 +21,11 @@ import com.ndanh.mytranslator.screen.voice.VoiceTranslatorActivity;
 public class SplashActivity extends BaseActivity {
 
     @Override
+    protected void initView() {
+
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);

@@ -5,15 +5,12 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.text.TextUtils;
 
 import com.ndanh.mytranslator.model.History;
-import com.ndanh.mytranslator.services.DAO.HistoryDao;
-import com.ndanh.mytranslator.util.Database.SimpleSQLiteOpenHelper;
+import com.ndanh.mytranslator.services.HistoryDao;
+import com.ndanh.mytranslator.util.SimpleSQLiteOpenHelper;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -21,7 +18,6 @@ import java.util.List;
  */
 
 public class HistoryDaoImp implements HistoryDao {
-
     private static final String GET_ALL_QUERY = "select * from " + SimpleSQLiteOpenHelper.TABLE_RECORD + " order by " + SimpleSQLiteOpenHelper.KEY_TIMESTAMP +" DESC;";
     private static final String GET_QUERY = "select * from " + SimpleSQLiteOpenHelper.TABLE_RECORD + " where " + SimpleSQLiteOpenHelper.KEY_TIMESTAMP + "= ?;" ;
     private SQLiteOpenHelper _openHelper;

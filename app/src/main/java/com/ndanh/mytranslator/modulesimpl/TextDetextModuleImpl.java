@@ -80,6 +80,21 @@ public class TextDetextModuleImpl implements IDetector {
         if(callback != null){
             callback.onSuccess ( result);
         }
+//        mTess.setImage ( bitmap );
+//        mTess.getUTF8Text();
+//        ResultIterator iterator = mTess.getResultIterator ();
+//        List<DetectResult> result = new ArrayList<DetectResult> ();
+//        DetectResult item = new DetectResult ();
+//        while (iterator.next(TessBaseAPI.PageIteratorLevel.RIL_TEXTLINE)){
+//            if(iterator.confidence ( TessBaseAPI.PageIteratorLevel.RIL_TEXTLINE ) < 50) continue;
+//            item = new DetectResult ();
+//            item.setText(iterator.getUTF8Text ( TessBaseAPI.PageIteratorLevel.RIL_TEXTLINE ));
+//            item.setPosition (iterator.getBoundingRect ( TessBaseAPI.PageIteratorLevel.RIL_TEXTLINE ));
+//            result.add ( item );
+//        }
+//        if(callback != null){
+//            callback.onSuccess ( result);
+//        }
     }
 
     private void checkFile(File dir, String lang) {
@@ -142,8 +157,8 @@ public class TextDetextModuleImpl implements IDetector {
             return false;
         }
 
-        int average = (rect1.width () + rect2.width () )/2;
-        int distance = rect1.left - rect2.right;
-        return distance <= average;
+        int spaceSize = rect1.height () / 2;
+        int distance = rect2.left - rect1.right;
+        return distance <= spaceSize;
     }
 }

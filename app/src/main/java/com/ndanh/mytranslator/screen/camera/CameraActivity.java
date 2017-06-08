@@ -1,29 +1,23 @@
 package com.ndanh.mytranslator.screen.camera;
 
 import android.Manifest;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.IdRes;
-import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.PopupMenu;
-import android.text.Editable;
-import android.text.TextPaint;
-import android.text.TextUtils;
-import android.text.TextWatcher;
 import android.view.Display;
-import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.Surface;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -33,8 +27,11 @@ import com.ndanh.mytranslator.R;
 import com.ndanh.mytranslator.base.NavigatorFooterActivity;
 import com.ndanh.mytranslator.model.DetectResult;
 import com.ndanh.mytranslator.model.Language;
-import com.ndanh.mytranslator.modulesimpl.ModuleManageImpl;
 import com.ndanh.mytranslator.util.PermissionHelper;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -42,16 +39,18 @@ import butterknife.OnClick;
 import butterknife.OnTextChanged;
 
 import java.io.IOException;
+import java.util.Observable;
+import java.util.Observer;
+
 import android.graphics.BitmapFactory;
 import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 public class CameraActivity extends NavigatorFooterActivity
-        implements SurfaceHolder.Callback, CameraContract.ICameraView {
+        implements SurfaceHolder.Callback, CameraContract.ICameraView ,Observer {
 
     //region variable View
     private Camera camera;
@@ -64,11 +63,12 @@ public class CameraActivity extends NavigatorFooterActivity
     @BindView ( R.id.ar_mask ) ImageView arMask;
     @BindView(R.id.action_choose_source) Button chooseSourceLang;
     @BindView(R.id.action_choose_dest) Button chooseDestLang;
-
+    @BindView(R.id.panel_progress_bar) LinearLayout panelProgressBar;
     //endregion
 
     //region variable logic
-    private boolean previewMode = true;
+    private PreviewMode previewController;
+    private ProcessingMode processingController;
     private static final String TAG = "OcrCaptureActivity";
     private int orientation = 90;
     private CameraContract.ICameraPresenter presenter;
@@ -123,6 +123,12 @@ public class CameraActivity extends NavigatorFooterActivity
     @Override
     protected void onPause() {
         super.onPause();
+        previewController.deleteObserver(this);
+        processingController.deleteObserver(this);
+        previewController = null;
+        processingController = null;
+
+
         this.presenter.pause ();
     }
 
@@ -152,16 +158,15 @@ public class CameraActivity extends NavigatorFooterActivity
 
     @Override
     public void displayResult(List<DetectResult> result, int width, int height) {
-        btnTakeButton.setClickable ( true );
+        processingController.off();
         arMask.setImageBitmap ( drawTextToBitmap(width, height, result) );
-        arMask.bringToFront ();
     }
 
 
 
     @Override
     public void showMessage(String msg) {
-        btnTakeButton.setClickable ( true );
+        processingController.off();
         Toast.makeText ( getApplicationContext (),  msg , Toast.LENGTH_SHORT ).show ();
     }
 
@@ -264,21 +269,23 @@ public class CameraActivity extends NavigatorFooterActivity
     }
 
     public void captureImage(View view) throws IOException {
-        if(previewMode){
-            btnTakeButton.setClickable ( false );
+        if(previewController.isPreviewMode()){
+            processingController.on();
             camera.takePicture(null, null, captureImageCallback);
-            previewMode = false;
+            previewController.off();
         }else{
-            previewMode = true;
+            previewController.on();
             refreshCamera();
-            surfaceView.bringToFront ();
         }
     }
 
-    private void initView(){
+    public void initView(){
+        previewController = new PreviewMode();
+        previewController.addObserver(this);
+        processingController = new ProcessingMode();
+        processingController.addObserver(this);
         surfaceHolder = surfaceView.getHolder();
         surfaceHolder.addCallback(this);
-        surfaceView.bringToFront ();
         srcLang = Language.ELanguage.ENG;
         destLang = Language.ELanguage.JAP;
         chooseSourceLang.setText(Language.getLongLanguage ( srcLang ));
@@ -294,8 +301,9 @@ public class CameraActivity extends NavigatorFooterActivity
 
         paint = new Paint();
         paint.setTypeface(Typeface.DEFAULT);
-        paint.setColor(Color.WHITE);
+        paint.setColor(ContextCompat.getColor( getApplicationContext() ,R.color.colorTextAR));
         paint.setStyle(Paint.Style.FILL);
+
         int textSize;
         for (DetectResult item: result) {
             textSize = determineMaxTextSize(item.getText() , item.getPosition().width(), item.getPosition().height ());
@@ -348,13 +356,13 @@ public class CameraActivity extends NavigatorFooterActivity
         guessSize = (maxSize - minSize) / 2;
 
         paint.setTextSize(guessSize);
-        paint.getTextBounds("a", 0, 1, bounds);
+        paint.getTextBounds(str, 0, str.length(), bounds);
         if(bounds.height () < maxHeight)
             return size;
 
         while (true){
             paint.setTextSize(guessSize);
-            paint.getTextBounds("a", 0, 1, bounds);
+            paint.getTextBounds(str, 0, str.length(), bounds);
 
             if(bounds.height () == maxHeight){
                 size = guessSize;
@@ -433,8 +441,36 @@ public class CameraActivity extends NavigatorFooterActivity
 
     @OnTextChanged(R.id.action_choose_dest)
     protected void onDestLangChanged(CharSequence text) {
-        if(!previewMode)
+        if(!previewController.isPreviewMode())
             this.presenter.changeDestLanguage ();
+    }
+    //endregion
+
+    //region Observer implement
+    @Override
+    public void update(Observable o, Object arg) {
+        if(o instanceof PreviewMode){
+            if(previewController.isPreviewMode()){
+                Toast.makeText(getApplicationContext(), "PreviewMode is on", Toast.LENGTH_SHORT).show();
+
+                surfaceView.bringToFront();
+            } else {
+                Toast.makeText(getApplicationContext(), "PreviewMode is off", Toast.LENGTH_SHORT).show();
+                arMask.bringToFront();
+            }
+        } else if (o instanceof ProcessingMode){
+            if(processingController.isProcessingMode()){
+                Toast.makeText(getApplicationContext(), "Processing mode is on", Toast.LENGTH_SHORT).show();
+                panelProgressBar.setVisibility(View.VISIBLE);
+                panelProgressBar.bringToFront();
+                btnTakeButton.setClickable(false);
+            } else {
+                Toast.makeText(getApplicationContext(), "Processing mode is off", Toast.LENGTH_SHORT).show();
+                panelProgressBar.setVisibility(View.GONE);
+                btnTakeButton.setClickable(true);
+            }
+        }
+
     }
     //endregion
 }

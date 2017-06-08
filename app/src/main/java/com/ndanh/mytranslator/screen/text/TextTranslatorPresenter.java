@@ -6,7 +6,7 @@ import com.ndanh.mytranslator.modulesimpl.HistoryDaoImp;
 import com.ndanh.mytranslator.modulesimpl.ModuleManageImpl;
 import com.ndanh.mytranslator.modulesimpl.TranslateGCloud.Translation;
 import com.ndanh.mytranslator.modulesimpl.TranslateGCloud.TranslatorResponse;
-import com.ndanh.mytranslator.services.DAO.HistoryDao;
+import com.ndanh.mytranslator.services.HistoryDao;
 import com.ndanh.mytranslator.services.ITranslate;
 
 import java.util.ArrayList;
@@ -69,9 +69,7 @@ public class TextTranslatorPresenter implements TextTranslatorContract.ITextTran
     @Override
     public void pause() {
         iTranslate = null;
-
         historyDao = null;
-        ModuleManageImpl.pause ();
     }
 
     @Override
@@ -80,26 +78,4 @@ public class TextTranslatorPresenter implements TextTranslatorContract.ITextTran
         srcString.add(view.getTextSrc());
         iTranslate.translate(srcString, Language.getShortLanguage ( view.getSrcLang() ),Language.getShortLanguage ( view.getDestLang() ) );
     }
-
-    private ITranslate.OnTranslateListener translateListener = new ITranslate.OnTranslateListener() {
-        @Override
-        public void onSuccess(TranslatorResponse result) {
-            String textTranslated = "";
-            for (Translation item : result.getData().getTranslations()) {
-                historyDao.addHistory ( new History (
-                        Language.getLongLanguage (view.getSrcLang ()),
-                        Language.getLongLanguage ( view.getDestLang ()),
-                        view.getTextSrc (),
-                        item.getTranslatedText())
-                );
-                textTranslated += item.getTranslatedText() + "\n";
-            }
-            view.displayResultTranslate(textTranslated);
-        }
-
-        @Override
-        public void onFailed(String msg) {
-            view.displayResultTranslate(msg);
-        }
-    };
 }

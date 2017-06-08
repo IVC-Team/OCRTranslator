@@ -75,7 +75,7 @@ public class TextTranslatorActivity extends NavigatorFooterActivity implements T
         initView();
     }
 
-    private void initView() {
+    public void initView() {
         srcLang = Language.ELanguage.ENG;
         destLang = Language.ELanguage.JAP;
 

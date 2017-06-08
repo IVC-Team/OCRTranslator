@@ -1,7 +1,7 @@
 package com.ndanh.mytranslator.screen.history;
 
 import com.ndanh.mytranslator.modulesimpl.HistoryDaoImp;
-import com.ndanh.mytranslator.services.DAO.HistoryDao;
+import com.ndanh.mytranslator.services.HistoryDao;
 
 /**
  * Created by ndanh on 5/10/2017.

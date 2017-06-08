@@ -23,7 +23,7 @@ public class App extends Application {
     @Override
     public void onTerminate() {
         super.onTerminate();
-        ModuleManageImpl.clean();
+        ModuleManageImpl.release();
         Language.clean ( );
         DeleteMode.clean();
         Setting.clean();

@@ -52,6 +52,7 @@
     <color name="colorBGNavigatorMenu">#222222</color>
     <color name="white">#FFFFFF</color>
     <color name="colorBackground">#4B9FBF</color>
+    <color name="colorTextAR">#e0e0e0</color>
 
 
 </resources>

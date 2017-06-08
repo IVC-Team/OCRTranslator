@@ -12,10 +12,6 @@ import com.ndanh.mytranslator.services.ModuleManager;
  */
 
 public final class ModuleManageImpl extends ModuleManager {
-
-    private static IVoiceDetect iVoiceDetect;
-    private static ITranslate iTranslate;
-    private static IDetector iDetector;
     private Context context;
     private ModuleManageImpl(final Context context) {
         this.context = context;
@@ -25,40 +21,23 @@ public final class ModuleManageImpl extends ModuleManager {
         manager = new ModuleManageImpl(context);
     }
 
-    public static void clean() {
-        if(iDetector != null) iDetector.release ();
-        if(iTranslate != null)iTranslate.release ();
-        if(iVoiceDetect != null) iVoiceDetect.release ();
+    public static void release() {
         manager = null;
     }
 
-    public static void pause() {
-        iDetector = null;
-        iTranslate = null;
-        iVoiceDetect = null;
-    }
 
     @Override
     public ITranslate getTranslateModule() {
-        if(iTranslate == null){
-            iTranslate = new TranslateModuleImpl(context);
-        }
-        return iTranslate;
+        return new TranslateModuleImpl(context);
     }
 
     @Override
     public IVoiceDetect getVoiceDetectModule() {
-        if(iVoiceDetect == null){
-            iVoiceDetect = new VoiceDetectModuleImpl(context);
-        }
-        return iVoiceDetect;
+        return new VoiceDetectModuleImpl(context);
     }
 
     @Override
     public IDetector getTextDetect() {
-        if (iDetector == null){
-            iDetector = new TextDetextModuleImpl(context);
-        }
-        return iDetector;
+        return  new TextDetextModuleImpl(context);
     }
 }

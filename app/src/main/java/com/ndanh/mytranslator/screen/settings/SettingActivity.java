@@ -1,23 +1,13 @@
 package com.ndanh.mytranslator.screen.settings;
 
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.support.annotation.StringRes;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.ImageView;
 import android.widget.ListView;
 
 import com.ndanh.mytranslator.R;
 import com.ndanh.mytranslator.adapter.SettingAdapter;
 import com.ndanh.mytranslator.base.BaseActivity;
 import com.ndanh.mytranslator.model.Setting;
-import com.ndanh.mytranslator.screen.splash.SplashActivity;
-import com.ndanh.mytranslator.screen.text.TextTranslatorActivity;
-import com.ndanh.mytranslator.screen.voice.VoiceTranslatorActivity;
-import com.ndanh.mytranslator.util.Config;
-import com.ndanh.mytranslator.util.Database.SimpleSQLiteOpenHelper;
+import com.ndanh.mytranslator.util.SimpleSQLiteOpenHelper;
 import com.ndanh.mytranslator.util.DialogHelper;
 
 import java.util.ArrayList;
@@ -32,6 +22,11 @@ public class SettingActivity extends BaseActivity implements SettingAdapter.OnIt
     ListView lstSetting;
     private SettingAdapter adapter;
 
+
+    @Override
+    protected void initView() {
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

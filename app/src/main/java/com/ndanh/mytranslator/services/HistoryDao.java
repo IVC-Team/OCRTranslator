@@ -1,4 +1,4 @@
-package com.ndanh.mytranslator.services.DAO;
+package com.ndanh.mytranslator.services;
 
 import com.ndanh.mytranslator.model.History;
 

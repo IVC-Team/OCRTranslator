@@ -1,4 +1,4 @@
-package com.ndanh.mytranslator.util.Database;
+package com.ndanh.mytranslator.util;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;

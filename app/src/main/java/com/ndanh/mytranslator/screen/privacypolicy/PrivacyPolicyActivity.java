@@ -15,6 +15,12 @@ import butterknife.OnClick;
 public class PrivacyPolicyActivity extends BaseActivity {
     @BindView ( R.id.webview )
     WebView webView;
+
+    @Override
+    protected void initView() {
+
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate ( savedInstanceState );

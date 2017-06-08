@@ -50,6 +50,7 @@
     <string name="dialog_alert_title">Alert</string>
     <string name="dialog_action_ok_title">OK</string>
     <string name="setting_message_confirm_delete_history">Do you want delete history ?</string>
+    <string name="history_message_confirm_delete_history">Do you want delete these records ?</string>
     <string name="translate_module_fail_message">Translate failed.</string>
     <string name="setting_message_confirm_change_start_mode">Do you want change start screen?</string>
 </resources>

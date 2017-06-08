@@ -6,7 +6,7 @@ import com.ndanh.mytranslator.modulesimpl.HistoryDaoImp;
 import com.ndanh.mytranslator.modulesimpl.ModuleManageImpl;
 import com.ndanh.mytranslator.modulesimpl.TranslateGCloud.Translation;
 import com.ndanh.mytranslator.modulesimpl.TranslateGCloud.TranslatorResponse;
-import com.ndanh.mytranslator.services.DAO.HistoryDao;
+import com.ndanh.mytranslator.services.HistoryDao;
 import com.ndanh.mytranslator.services.ITranslate;
 
 import java.util.ArrayList;
@@ -70,7 +70,6 @@ public class VoiceTranslatorPresenter implements VoiceTranslatorContract.IVoiceT
     public void pause() {
         mTranslate = null;
         historyDao = null;
-        ModuleManageImpl.pause ();
     }
 
     @Override

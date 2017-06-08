@@ -2,6 +2,8 @@ package com.ndanh.mytranslator.screen.voice;
 
 import com.ndanh.mytranslator.model.History;
 import com.ndanh.mytranslator.model.Language;
+import com.ndanh.mytranslator.modulesimpl.HistoryDaoImp;
+import com.ndanh.mytranslator.modulesimpl.ModuleManageImpl;
 import com.ndanh.mytranslator.modulesimpl.TranslateGCloud.Translation;
 import com.ndanh.mytranslator.modulesimpl.TranslateGCloud.TranslatorResponse;
 import com.ndanh.mytranslator.services.DAO.HistoryDao;
@@ -20,11 +22,9 @@ public class VoiceTranslatorPresenter implements VoiceTranslatorContract.IVoiceT
     private VoiceTranslatorContract.IVoiceTranslatorView mView;
     private ITranslate mTranslate;
 
-    public VoiceTranslatorPresenter (VoiceTranslatorContract.IVoiceTranslatorView view, ITranslate translate, HistoryDao historyDao){
+    public VoiceTranslatorPresenter (VoiceTranslatorContract.IVoiceTranslatorView view){
         this.mView = view;
         mView.setPresenter ( this );
-        this.mTranslate = translate;
-        this.historyDao = historyDao;
     }
 
     @Override
@@ -35,14 +35,42 @@ public class VoiceTranslatorPresenter implements VoiceTranslatorContract.IVoiceT
     @Override
     public void stop() {
         mView = null;
-        mTranslate = null;
-        translateListener = null;
-        historyDao = null;
     }
 
     @Override
     public void resume() {
-        mTranslate.setOnTranslateListener(translateListener);
+        this.mTranslate = ModuleManageImpl.getInstance().getTranslateModule();
+        this.historyDao = new HistoryDaoImp ( mView.getApplicationContext () );
+        this.mTranslate.setOnTranslateListener ( new ITranslate.OnTranslateListener () {
+            @Override
+            public void onSuccess(TranslatorResponse result) {
+                String textTranslated = "";
+                for (Translation item : result.getData().getTranslations()) {
+                    if(textTranslated != "")
+                        textTranslated += "\n";
+                    historyDao.addHistory ( new History (
+                            Language.getLongLanguage (mView.getSrcLang ()),
+                            Language.getLongLanguage ( mView.getDestLang ()),
+                            mView.getTextSrc (),
+                            item.getTranslatedText())
+                    );
+                    textTranslated += item.getTranslatedText();
+                }
+                mView.displayResultTranslate(textTranslated);
+            }
+
+            @Override
+            public void onFailed(String msg) {
+                mView.displayMessage ( msg );
+            }
+        } );
+    }
+
+    @Override
+    public void pause() {
+        mTranslate = null;
+        historyDao = null;
+        ModuleManageImpl.pause ();
     }
 
     @Override
@@ -51,26 +79,4 @@ public class VoiceTranslatorPresenter implements VoiceTranslatorContract.IVoiceT
         src.add( mView.getTextSrc ());
         mTranslate.translate( src, Language.getShortLanguage ( mView.getSrcLang() ),Language.getShortLanguage ( mView.getDestLang() ) );
     }
-
-    private ITranslate.OnTranslateListener translateListener = new ITranslate.OnTranslateListener() {
-        @Override
-        public void onSuccess(TranslatorResponse result) {
-            String textTranslated = "";
-            for (Translation item : result.getData().getTranslations()) {
-                historyDao.addHistory ( new History (
-                        Language.getLongLanguage (mView.getSrcLang ()),
-                        Language.getLongLanguage ( mView.getDestLang ()),
-                        mView.getTextSrc (),
-                        item.getTranslatedText())
-                );
-                textTranslated += item.getTranslatedText() + "\n";
-            }
-            mView.displayResultTranslate(textTranslated);
-        }
-
-        @Override
-        public void onFailed(String msg) {
-            mView.displayResultTranslate(msg);
-        }
-    };
 }

@@ -12,10 +12,9 @@ public class HistoryPresenter implements HistoryContract.IHistoryPresenter {
     private HistoryDao historyDao;
     private HistoryContract.IHistoryView view;
 
-    public HistoryPresenter(HistoryActivity view, HistoryDao historyDao) {
+    public HistoryPresenter(HistoryActivity view) {
         this.view = view;
         view.setPresenter(this);
-        this.historyDao = historyDao;
     }
 
     @Override
@@ -26,12 +25,16 @@ public class HistoryPresenter implements HistoryContract.IHistoryPresenter {
     @Override
     public void stop() {
         this.view = null;
-        this.historyDao = null;
     }
 
     @Override
     public void resume() {
+        this.historyDao =  new HistoryDaoImp ( view.getApplicationContext () );
+    }
 
+    @Override
+    public void pause() {
+        this.historyDao = null;
     }
 
     @Override

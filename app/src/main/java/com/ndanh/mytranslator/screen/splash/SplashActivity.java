@@ -31,9 +31,7 @@ public class SplashActivity extends BaseActivity {
 
         @Override
         protected void onPreExecute(){
-            ModuleManageImpl.init(SplashActivity.this);
-            Language.init ( SplashActivity.this );
-            Setting.initSetting ( SplashActivity.this );
+
         }
 
         @Override

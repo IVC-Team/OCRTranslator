@@ -16,12 +16,9 @@ public final class ModuleManageImpl extends ModuleManager {
     private static IVoiceDetect iVoiceDetect;
     private static ITranslate iTranslate;
     private static IDetector iDetector;
-
-
+    private Context context;
     private ModuleManageImpl(final Context context) {
-        iVoiceDetect = new VoiceDetectModuleImpl(context);
-        iTranslate = new TranslateModuleImpl(context);
-        iDetector = new TextDetextModuleImpl(context);
+        this.context = context;
     }
 
     public static void init(Context context){
@@ -29,22 +26,39 @@ public final class ModuleManageImpl extends ModuleManager {
     }
 
     public static void clean() {
-        iDetector.release ();
-        iTranslate.release ();
-        iVoiceDetect.release ();
+        if(iDetector != null) iDetector.release ();
+        if(iTranslate != null)iTranslate.release ();
+        if(iVoiceDetect != null) iVoiceDetect.release ();
         manager = null;
+    }
+
+    public static void pause() {
+        iDetector = null;
+        iTranslate = null;
+        iVoiceDetect = null;
     }
 
     @Override
     public ITranslate getTranslateModule() {
+        if(iTranslate == null){
+            iTranslate = new TranslateModuleImpl(context);
+        }
         return iTranslate;
     }
 
     @Override
     public IVoiceDetect getVoiceDetectModule() {
+        if(iVoiceDetect == null){
+            iVoiceDetect = new VoiceDetectModuleImpl(context);
+        }
         return iVoiceDetect;
     }
 
     @Override
-    public IDetector getTextDetect() { return iDetector; }
+    public IDetector getTextDetect() {
+        if (iDetector == null){
+            iDetector = new TextDetextModuleImpl(context);
+        }
+        return iDetector;
+    }
 }

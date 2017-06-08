@@ -8,4 +8,5 @@ public interface BasePresenter {
     void start();
     void stop();
     void resume();
+    void pause();
 }

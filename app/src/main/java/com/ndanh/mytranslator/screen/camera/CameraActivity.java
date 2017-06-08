@@ -34,7 +34,6 @@ import com.ndanh.mytranslator.base.NavigatorFooterActivity;
 import com.ndanh.mytranslator.model.DetectResult;
 import com.ndanh.mytranslator.model.Language;
 import com.ndanh.mytranslator.modulesimpl.ModuleManageImpl;
-import com.ndanh.mytranslator.util.CToast;
 import com.ndanh.mytranslator.util.PermissionHelper;
 import java.util.List;
 import butterknife.BindView;
@@ -59,7 +58,6 @@ public class CameraActivity extends NavigatorFooterActivity
     private SurfaceHolder surfaceHolder;
     private @IdRes int selectedButton;
     @BindView ( R.id.cameraView ) SurfaceView surfaceView;
-    @BindView ( R.id.tranlate_result ) ImageView rawCapture;
     @BindView((R.id.preview)) RelativeLayout cameraView;
     @BindView ( R.id.navigation_footer_camera ) RelativeLayout hiddenPanel;
     @BindView ( R.id.btn_takeButton ) ImageView btnTakeButton;
@@ -85,13 +83,8 @@ public class CameraActivity extends NavigatorFooterActivity
             Matrix matrix = new Matrix();
             matrix.postRotate(orientation);
             Bitmap rotatedBitmap = Bitmap.createBitmap(bmp , 0, 0, bmp .getWidth(), bmp .getHeight(), matrix, true);
-//            Bitmap scaledBitmap = BitmapFactory.decodeResource (getResources (), R.drawable.capture);
             Bitmap scaledBitmap = Bitmap.createScaledBitmap(rotatedBitmap ,cameraView.getWidth (),cameraView.getHeight (),true);
-            rawCapture.setImageBitmap(scaledBitmap);
-            rawCapture.bringToFront ();
             presenter.doTranslate(scaledBitmap.copy(scaledBitmap.getConfig(), true));
-            refreshCamera();
-            btnTakeButton.setClickable ( true );
         }
     };
     //endregion
@@ -111,12 +104,13 @@ public class CameraActivity extends NavigatorFooterActivity
     @Override
     public void onResume() {
         super.onResume();
-        this.presenter.resume ();}
+        this.presenter.resume ();
+        initView();
+    }
 
     @Override
     protected void onStart() {
         super.onStart();
-        initView();
         this.presenter.start();
     }
 
@@ -129,6 +123,7 @@ public class CameraActivity extends NavigatorFooterActivity
     @Override
     protected void onPause() {
         super.onPause();
+        this.presenter.pause ();
     }
 
     //endregion
@@ -137,7 +132,7 @@ public class CameraActivity extends NavigatorFooterActivity
 
     @Override
     public void initPresenter() {
-        new CameraPresenter(this, ModuleManageImpl.getInstance().getTextDetect(), ModuleManageImpl.getInstance().getTranslateModule());
+        new CameraPresenter(this);
     }
 
     @Override
@@ -157,22 +152,17 @@ public class CameraActivity extends NavigatorFooterActivity
 
     @Override
     public void displayResult(List<DetectResult> result, int width, int height) {
-        CToast.showMessage ( "Start draw Bitmap" );
-        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        Paint paint = new Paint();
-        paint.setColor(ContextCompat.getColor( getApplicationContext() ,R.color.transparent));
-        canvas.drawRect(0F, 0F, (float) width, (float) height, paint);
-
-        drawTextToBitmap(bitmap , result);
-        arMask.setImageBitmap ( bitmap );
+        btnTakeButton.setClickable ( true );
+        arMask.setImageBitmap ( drawTextToBitmap(width, height, result) );
         arMask.bringToFront ();
-        CToast.showMessage ( "Finish draw Bitmap" );
     }
+
+
 
     @Override
     public void showMessage(String msg) {
-        Toast.makeText ( getApplicationContext (),  msg , Toast.LENGTH_LONG ).show ();
+        btnTakeButton.setClickable ( true );
+        Toast.makeText ( getApplicationContext (),  msg , Toast.LENGTH_SHORT ).show ();
     }
 
     //endregion
@@ -220,24 +210,20 @@ public class CameraActivity extends NavigatorFooterActivity
 
             if(display.getRotation() == Surface.ROTATION_0)
             {
-                CToast.showMessage ("Rotation: " + display.getRotation()  );
                 orientation = 90;
             }
 
             if(display.getRotation() == Surface.ROTATION_90)
             {
-                CToast.showMessage ("Rotation: " + display.getRotation()  );
                 orientation = 0;
             }
 
             if(display.getRotation() == Surface.ROTATION_180)
             {
-                CToast.showMessage ("Rotation: " + display.getRotation()  );
             }
 
             if(display.getRotation() == Surface.ROTATION_270)
             {
-                CToast.showMessage ("Rotation: " + display.getRotation()  );
                 orientation = 180;
             }
 
@@ -284,6 +270,7 @@ public class CameraActivity extends NavigatorFooterActivity
             previewMode = false;
         }else{
             previewMode = true;
+            refreshCamera();
             surfaceView.bringToFront ();
         }
     }
@@ -298,34 +285,99 @@ public class CameraActivity extends NavigatorFooterActivity
         chooseDestLang.setText(Language.getLongLanguage ( destLang ));
     }
 
-    private void drawTextToBitmap(Bitmap bitmap, List<DetectResult> result) {
+    public Bitmap drawTextToBitmap( int width, int height , List<DetectResult> result) {
+        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
-
         Paint paint = new Paint();
+        paint.setColor(ContextCompat.getColor( getApplicationContext() ,R.color.transparent));
+        canvas.drawRect(0F, 0F, (float) width, (float) height, paint);
+
+        paint = new Paint();
         paint.setTypeface(Typeface.DEFAULT);
         paint.setColor(Color.WHITE);
         paint.setStyle(Paint.Style.FILL);
-
+        int textSize;
         for (DetectResult item: result) {
-            int textSize = determineMaxTextSize(item.getText() , item.getPosition().width(), item.getPosition().height ());
+            textSize = determineMaxTextSize(item.getText() , item.getPosition().width(), item.getPosition().height ());
             paint.setTextSize(textSize);
             canvas.drawText(item.getText() , item.getPosition ().left,(item.getPosition ().bottom - textSize/4 ) ,paint);
         }
+        return bitmap;
     }
 
     private int determineMaxTextSize(String str, float maxWidth, float maxHeight) {
+        if(str == "") return 0;
         int size = 0;
+
+        int maxSize = 400 , minSize = 0;
         Paint paint = new Paint();
-        do {
-            paint.setTextSize(++ size);
-        } while(paint.measureText(str) < maxWidth);
+
+        paint.setTextSize(maxSize);
+        if(paint.measureText(str) == 0){
+            return 0;
+        }
+        while (paint.measureText(str) < maxWidth) {
+            minSize = maxSize;
+            maxSize *= 2;
+            paint.setTextSize(maxSize);
+        };
+        int guessSize = (maxSize - minSize) / 2;
+        while (true){
+            paint.setTextSize(guessSize);
+            if(paint.measureText(str) == maxWidth){
+                size = guessSize;
+                break;
+            }
+            else if(paint.measureText(str) > maxWidth){
+                maxSize = guessSize;
+                guessSize = (maxSize -minSize)/2  + minSize;
+            }
+            else{
+                minSize = guessSize;
+                guessSize = ((maxSize -minSize) / 2) + minSize;
+            }
+            if((maxSize - minSize) <= 2){
+                size = maxSize;
+                break;
+            }
+        }
 
         Rect bounds = new Rect();
+        maxSize = size;
+        minSize = 0;
+        guessSize = (maxSize - minSize) / 2;
 
-        do {
+        paint.setTextSize(guessSize);
+        paint.getTextBounds("a", 0, 1, bounds);
+        if(bounds.height () < maxHeight)
+            return size;
+
+        while (true){
+            paint.setTextSize(guessSize);
             paint.getTextBounds("a", 0, 1, bounds);
-            paint.setTextSize(-- size);
-        } while(bounds.height () > maxHeight);
+
+            if(bounds.height () == maxHeight){
+                size = guessSize;
+                break;
+            }
+            else if(bounds.height () > maxHeight){
+                maxSize = guessSize;
+                guessSize = (maxSize -minSize)/2  + minSize;
+            }
+            else{
+                minSize = guessSize;
+                guessSize = ((maxSize -minSize) / 2) + minSize;
+            }
+            if((maxSize - minSize) <= 2){
+                size = maxSize;
+                break;
+            }
+        }
+
+//        do {
+//            paint.getTextBounds("a", 0, 1, bounds);
+//            paint.setTextSize(-- size);
+//        } while(bounds.height () > maxHeight);
 
         return size;
     }
@@ -347,17 +399,17 @@ public class CameraActivity extends NavigatorFooterActivity
     private PopupMenu.OnMenuItemClickListener popupMenuListener = new PopupMenu.OnMenuItemClickListener() {
         @Override
         public boolean onMenuItemClick(MenuItem item) {
-            Button a = (Button) findViewById( selectedButton );
+            Button combobox = (Button) findViewById( selectedButton );
             switch (selectedButton){
                 case R.id.action_choose_source:
                     Language.ELanguage temp = Language.setLangFromMenu(item.getItemId ());
                     if(temp == srcLang ) break;
                     srcLang = temp;
-                    a.setText(Language.getLongLanguage ( srcLang ));
+                    combobox.setText(Language.getLongLanguage ( srcLang ));
                     break;
                 case R.id.action_choose_dest:
                     destLang = Language.setLangFromMenu(item.getItemId ());
-                    a.setText(Language.getLongLanguage ( destLang ));
+                    combobox.setText(Language.getLongLanguage ( destLang ));
                     break;
                 default:
                     break;
@@ -379,5 +431,10 @@ public class CameraActivity extends NavigatorFooterActivity
         this.presenter.changeSrcLanguage ();
     }
 
+    @OnTextChanged(R.id.action_choose_dest)
+    protected void onDestLangChanged(CharSequence text) {
+        if(!previewMode)
+            this.presenter.changeDestLanguage ();
+    }
     //endregion
 }

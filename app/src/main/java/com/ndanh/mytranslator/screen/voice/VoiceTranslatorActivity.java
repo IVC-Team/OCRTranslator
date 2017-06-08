@@ -18,6 +18,7 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.ndanh.mytranslator.R;
@@ -169,7 +170,6 @@ public class VoiceTranslatorActivity extends NavigatorFooterActivity implements 
         initPresenter ();
         setContentView( R.layout.activity_voice_translator);
         ButterKnife.bind ( this );
-        initView();
         PermissionHelper.requestPermission ( this, Manifest.permission.RECORD_AUDIO );
         PermissionHelper.requestPermission ( this, Manifest.permission.WRITE_EXTERNAL_STORAGE );
     }
@@ -184,6 +184,19 @@ public class VoiceTranslatorActivity extends NavigatorFooterActivity implements 
     protected void onDestroy() {
         super.onDestroy();
         this.mPresenter.stop();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume ();
+        initView();
+        this.mPresenter.resume ();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause ();
+        this.mPresenter.pause ();
     }
 
     //Onclick region
@@ -221,7 +234,7 @@ public class VoiceTranslatorActivity extends NavigatorFooterActivity implements 
     //Override presenter methods
     @Override
     public void initPresenter() {
-        new VoiceTranslatorPresenter (this, ModuleManageImpl.getInstance().getTranslateModule(), new HistoryDaoImp ( getApplicationContext () ));
+        new VoiceTranslatorPresenter (this);
     }
 
     @Override
@@ -247,6 +260,11 @@ public class VoiceTranslatorActivity extends NavigatorFooterActivity implements 
     @Override
     public String getTextSrc() {
         return textSource.getText ().toString ();
+    }
+
+    @Override
+    public void displayMessage(String msg) {
+        Toast.makeText ( getApplicationContext (), msg , Toast.LENGTH_SHORT ).show ();
     }
 
     //private methods
@@ -313,11 +331,7 @@ public class VoiceTranslatorActivity extends NavigatorFooterActivity implements 
         speech = null;
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume ();
-        this.mPresenter.resume ();
-    }
+
 
     @Override
     public void invisibleView() {

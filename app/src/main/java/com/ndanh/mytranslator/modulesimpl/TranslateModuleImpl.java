@@ -1,22 +1,18 @@
 package com.ndanh.mytranslator.modulesimpl;
 
 import android.content.Context;
-import android.support.annotation.StringRes;
-
 import com.ndanh.mytranslator.R;
 import com.ndanh.mytranslator.modulesimpl.TranslateGCloud.ApiUtils;
+import com.ndanh.mytranslator.modulesimpl.TranslateGCloud.Data;
 import com.ndanh.mytranslator.modulesimpl.TranslateGCloud.TranslateService;
+import com.ndanh.mytranslator.modulesimpl.TranslateGCloud.Translation;
 import com.ndanh.mytranslator.modulesimpl.TranslateGCloud.TranslatorResponse;
 import com.ndanh.mytranslator.services.ITranslate;
-import com.ndanh.mytranslator.util.CToast;
 import com.ndanh.mytranslator.util.Config;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -40,8 +36,22 @@ public final class TranslateModuleImpl implements ITranslate {
 
     @Override
     public void translate(List<String> src, String srclang, String destLang) {
-
-        CToast.showMessage ( "Start translate... " );
+        if(srclang == destLang){
+            if(listener == null) return;
+            TranslatorResponse response = new TranslatorResponse ();
+            Data data = new Data ();
+            List<Translation> translations = new ArrayList<> (  );
+            Translation translation;
+            for (String item : src) {
+                translation = new Translation ();
+                translation.setTranslatedText ( item );
+                translations.add ( translation );
+            }
+            data.setTranslations ( translations );
+            response.setData ( data );
+            listener.onSuccess(response);
+            return;
+        }
         Map<String, String> data = new HashMap<>();
         data.put(Config.TRANSLATE_GCLOUD_SOURCE, srclang);
         data.put(Config.TRANSLATE_GCLOUD_TARGET, destLang);
@@ -52,7 +62,6 @@ public final class TranslateModuleImpl implements ITranslate {
             public void onResponse(Call<TranslatorResponse> call, Response<TranslatorResponse> response) {
                 if(listener == null) return;
                 if(response.isSuccessful()) {
-                    CToast.showMessage ( "Fisnish translate... " );
                     listener.onSuccess(response.body());
                 }else {
 

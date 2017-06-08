@@ -23,5 +23,6 @@ public interface CameraContract {
     interface ICameraPresenter extends BasePresenter{
         void doTranslate(Bitmap bitmap);
         void changeSrcLanguage();
+        void changeDestLanguage();
     }
 }

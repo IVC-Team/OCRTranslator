@@ -69,6 +69,7 @@ public class HistoryActivity extends BaseActivity implements HistoryContract.IHi
     @Override
     protected void onPause() {
         super.onPause ();
+        this.presenter.pause ();
         DeleteMode.getInstance ().off ();
     }
 
@@ -82,7 +83,7 @@ public class HistoryActivity extends BaseActivity implements HistoryContract.IHi
 
     @Override
     public void initPresenter() {
-        new HistoryPresenter (this, new HistoryDaoImp ( this.getApplicationContext () ));
+        new HistoryPresenter (this);
     }
 
     @Override

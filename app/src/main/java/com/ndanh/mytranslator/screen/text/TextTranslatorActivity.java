@@ -17,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.ndanh.mytranslator.R;
 import com.ndanh.mytranslator.base.NavigatorFooterActivity;
@@ -180,7 +181,7 @@ public class TextTranslatorActivity extends NavigatorFooterActivity implements T
 
     @Override
     public void initPresenter() {
-        new TextTranslatorPresenter(this, ModuleManageImpl.getInstance().getTranslateModule(), new HistoryDaoImp ( getApplicationContext () ));
+        new TextTranslatorPresenter(this);
     }
 
     @Override
@@ -221,9 +222,20 @@ public class TextTranslatorActivity extends NavigatorFooterActivity implements T
     }
 
     @Override
+    public void displayMessage(String msg) {
+        Toast.makeText ( getApplicationContext (), msg , Toast.LENGTH_SHORT ).show ();
+    }
+
+    @Override
     protected void onResume() {
         super.onResume ();
         this.presenter.resume ();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause ();
+        this.presenter.pause ();
     }
 
     @Override

@@ -18,11 +18,11 @@ import android.widget.TextView;
 import com.ndanh.mytranslator.R;
 import com.ndanh.mytranslator.model.DetectResult;
 import com.ndanh.mytranslator.model.Language;
+import com.ndanh.mytranslator.modulesimpl.ModuleManageImpl;
 import com.ndanh.mytranslator.modulesimpl.TranslateGCloud.Translation;
 import com.ndanh.mytranslator.modulesimpl.TranslateGCloud.TranslatorResponse;
 import com.ndanh.mytranslator.services.IDetector;
 import com.ndanh.mytranslator.services.ITranslate;
-import com.ndanh.mytranslator.util.CToast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,16 +41,26 @@ public class CameraPresenter implements CameraContract.ICameraPresenter {
     private static final String TAG = "CameraPresenter";
     private int width, height;
     private CameraContract.ICameraView mView;
-
-    public CameraPresenter(CameraContract.ICameraView view, IDetector detector, ITranslate translate){
+    private List<DetectResult> detectResults;
+    public CameraPresenter(CameraContract.ICameraView view){
         this.mView = view;
-        this.mDetector = detector;
-        this.mTranslate = translate;
         mView.setPresenter(this);
     }
 
     @Override
     public void start() {
+
+    }
+
+    @Override
+    public void stop() {
+        this.mView = null;
+    }
+
+    @Override
+    public void resume() {
+        this.mDetector =  ModuleManageImpl.getInstance().getTextDetect();
+        this.mTranslate =  ModuleManageImpl.getInstance().getTranslateModule();
         mTranslate.setOnTranslateListener(new ITranslate.OnTranslateListener() {
             @Override
             public void onSuccess(TranslatorResponse result) {
@@ -64,12 +74,13 @@ public class CameraPresenter implements CameraContract.ICameraPresenter {
 
             @Override
             public void onFailed(String msg) {
-                CToast.showMessage ( msg );
+                mView.showMessage ( msg );
             }
         });
         mDetector.setDetectBitmapCallback ( new IDetector.DetectBitmapCallback () {
             @Override
             public void onSuccess(List<DetectResult> result) {
+                detectResults = result;
                 mView.showMessage ( "CameraPresenter DetectBitmapCallback onSuccess" );
                 List<String> srcString = new ArrayList<String> (  );
                 for (DetectResult item : result) {
@@ -81,13 +92,10 @@ public class CameraPresenter implements CameraContract.ICameraPresenter {
     }
 
     @Override
-    public void stop() {
-        this.mView = null;
-    }
-
-    @Override
-    public void resume() {
-
+    public void pause() {
+        this.mDetector = null;
+        this.mTranslate = null;
+        ModuleManageImpl.pause ();
     }
 
     @Override
@@ -100,5 +108,17 @@ public class CameraPresenter implements CameraContract.ICameraPresenter {
     @Override
     public void changeSrcLanguage() {
         mDetector.setLanguage ( Language.getShortLanguage ( mView.getSrcLang() ) );
+    }
+
+    @Override
+    public void changeDestLanguage() {
+        if(detectResults != null) {
+            List<String> srcString = new ArrayList<String> (  );
+            for (DetectResult item : detectResults) {
+                srcString.add ( item.toString () );
+            }
+            mTranslate.translate(srcString, Language.getShortLanguage ( mView.getSrcLang() ),Language.getShortLanguage ( mView.getDestLang() ) );
+        }
+
     }
 }

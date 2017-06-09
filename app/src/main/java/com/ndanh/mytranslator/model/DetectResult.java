@@ -9,7 +9,7 @@ import android.graphics.Rect;
 public class DetectResult {
     private String text;
     private Rect position;
-
+    private static int LENGT_POSITION = 16;
     public String getText() {
         return text;
     }
@@ -38,33 +38,25 @@ public class DetectResult {
 
     @Override
     public String toString() {
-        this.text.replace(">","");
         return DetectResult.parseRect2String(this.getPosition ()) + this.text ;
     }
 
     public static DetectResult parseDetectResult(String inst){
         DetectResult result = new DetectResult ();
-
-        int idx = inst.indexOf ( '>' );
-
-        result.setPosition ( parseString2Rect (  inst.substring (1 , idx ) ));
-        result.setText ( inst.substring (idx + 1 ));
-
+        result.setPosition ( parseString2Rect (  inst.substring (0 , LENGT_POSITION ) ));
+        result.setText ( inst.substring (LENGT_POSITION ));
         return result;
     }
 
     // parse left -> top -> right -> bottom
     public static String parseRect2String(Rect rect){
-        return "<" + rect.left + "-" + rect.top + "-" + rect.right + "-" + rect.bottom + ">";
+        return String.format("%04d",  rect.left) + String.format("%04d",rect.top) + String.format("%04d",  rect.right) + String.format("%04d", rect.bottom);
     };
 
     public static Rect parseString2Rect(String strPosition){
-        String[] parts = strPosition.split("-");
-        if(parts.length == 4){
-            return  new Rect ( Integer.valueOf (parts[0]), Integer.valueOf (parts[1]), Integer.valueOf (parts[2]), Integer.valueOf (parts[3]) );
-        } else  {
-            return null;
-        }
-
+        return  new Rect ( Integer.valueOf ( strPosition.substring (0 ,4 )),
+                Integer.valueOf ( strPosition.substring (4  ,8 )),
+                Integer.valueOf ( strPosition.substring (8  ,12)),
+                Integer.valueOf ( strPosition.substring (12  ,16)) );
     }
 }

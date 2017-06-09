@@ -1,6 +1,7 @@
 package com.ndanh.mytranslator.screen.camera;
 
 import android.graphics.Bitmap;
+import android.os.AsyncTask;
 
 import com.ndanh.mytranslator.model.DetectResult;
 import com.ndanh.mytranslator.model.Language;

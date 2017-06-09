@@ -1,5 +1,6 @@
 package com.ndanh.mytranslator.screen.settings;
 
+import android.Manifest;
 import android.os.Bundle;
 import android.widget.ListView;
 
@@ -7,6 +8,7 @@ import com.ndanh.mytranslator.R;
 import com.ndanh.mytranslator.adapter.SettingAdapter;
 import com.ndanh.mytranslator.base.BaseActivity;
 import com.ndanh.mytranslator.model.Setting;
+import com.ndanh.mytranslator.util.PermissionHelper;
 import com.ndanh.mytranslator.util.SimpleSQLiteOpenHelper;
 import com.ndanh.mytranslator.util.DialogHelper;
 
@@ -35,6 +37,7 @@ public class SettingActivity extends BaseActivity implements SettingAdapter.OnIt
         ButterKnife.bind ( this );
         this.adapter =  new SettingAdapter ( getApplicationContext (), getListSetting(), this );
         lstSetting.setAdapter ( adapter );
+        PermissionHelper.requestPermission ( this, Manifest.permission.WRITE_EXTERNAL_STORAGE );
     }
 
     @OnClick( R.id.action_clear )

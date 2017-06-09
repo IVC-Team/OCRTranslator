@@ -172,6 +172,7 @@ public class VoiceTranslatorActivity extends NavigatorFooterActivity implements 
         ButterKnife.bind ( this );
         PermissionHelper.requestPermission ( this, Manifest.permission.RECORD_AUDIO );
         PermissionHelper.requestPermission ( this, Manifest.permission.WRITE_EXTERNAL_STORAGE );
+        PermissionHelper.requestPermission ( this, Manifest.permission.INTERNET );
     }
 
     @Override

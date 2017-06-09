@@ -22,7 +22,6 @@ public class CameraPresenter implements CameraContract.ICameraPresenter {
 
     private IDetector mDetector;
     private ITranslate mTranslate;
-    private static final String TAG = "CameraPresenter";
     private int width, height;
     private CameraContract.ICameraView mView;
     private List<DetectResult> detectResultCache;
@@ -38,7 +37,6 @@ public class CameraPresenter implements CameraContract.ICameraPresenter {
 
     @Override
     public void stop() {
-        this.mView = null;
     }
 
     @Override
@@ -77,6 +75,8 @@ public class CameraPresenter implements CameraContract.ICameraPresenter {
     public void pause() {
         this.mDetector = null;
         this.mTranslate = null;
+        this.detectResultCache = null;
+        this.mView = null;
     }
 
     @Override

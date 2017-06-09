@@ -99,6 +99,7 @@ public class CameraActivity extends NavigatorFooterActivity
         ButterKnife.bind(this);
         PermissionHelper.requestPermission ( this, Manifest.permission.CAMERA );
         PermissionHelper.requestPermission ( this, Manifest.permission.WRITE_EXTERNAL_STORAGE );
+        PermissionHelper.requestPermission ( this, Manifest.permission.INTERNET );
     }
 
     @Override
@@ -127,8 +128,6 @@ public class CameraActivity extends NavigatorFooterActivity
         processingController.deleteObserver(this);
         previewController = null;
         processingController = null;
-
-
         this.presenter.pause ();
     }
 

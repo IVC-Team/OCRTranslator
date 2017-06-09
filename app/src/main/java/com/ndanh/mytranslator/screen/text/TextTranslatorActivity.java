@@ -72,6 +72,7 @@ public class TextTranslatorActivity extends NavigatorFooterActivity implements T
         setContentView(R.layout.activity_text_translator);
         ButterKnife.bind(this);
         PermissionHelper.requestPermission ( this, Manifest.permission.WRITE_EXTERNAL_STORAGE );
+        PermissionHelper.requestPermission ( this, Manifest.permission.INTERNET );
         initView();
     }
 

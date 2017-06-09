@@ -1,5 +1,6 @@
 package com.ndanh.mytranslator.screen.history;
 
+import android.Manifest;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -14,6 +15,7 @@ import com.ndanh.mytranslator.base.BaseActivity;
 import com.ndanh.mytranslator.model.History;
 import com.ndanh.mytranslator.modulesimpl.HistoryDaoImp;
 import com.ndanh.mytranslator.util.DialogHelper;
+import com.ndanh.mytranslator.util.PermissionHelper;
 import com.ndanh.mytranslator.util.SimpleSQLiteOpenHelper;
 
 import java.util.ArrayList;
@@ -43,6 +45,7 @@ public class HistoryActivity extends BaseActivity implements HistoryContract.IHi
         setContentView(R.layout.activity_history);
         ButterKnife.bind(this);
         DeleteMode.getInstance ().addObserver ( HistoryActivity.this );
+        PermissionHelper.requestPermission ( this, Manifest.permission.WRITE_EXTERNAL_STORAGE );
     }
 
     public void initView(){

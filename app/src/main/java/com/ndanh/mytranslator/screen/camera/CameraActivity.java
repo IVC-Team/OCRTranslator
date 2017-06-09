@@ -158,8 +158,9 @@ public class CameraActivity extends NavigatorFooterActivity
 
     @Override
     public void displayResult(List<DetectResult> result, int width, int height) {
+        arMask.setImageBitmap ( drawTextToBitmap(width, height, result, getDestLang ()) );
         processingController.off();
-        arMask.setImageBitmap ( drawTextToBitmap(width, height, result) );
+        arMask.bringToFront();
     }
 
 
@@ -292,7 +293,7 @@ public class CameraActivity extends NavigatorFooterActivity
         chooseDestLang.setText(Language.getLongLanguage ( destLang ));
     }
 
-    public Bitmap drawTextToBitmap( int width, int height , List<DetectResult> result) {
+    public Bitmap drawTextToBitmap(int width, int height , List<DetectResult> result, Language.ELanguage eLanguage) {
         Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
         Paint paint = new Paint();
@@ -308,8 +309,14 @@ public class CameraActivity extends NavigatorFooterActivity
         for (DetectResult item: result) {
             textSize = determineMaxTextSize(item.getText() , item.getPosition().width(), item.getPosition().height ());
             paint.setTextSize(textSize);
-            canvas.drawText(item.getText() , item.getPosition ().left,(item.getPosition ().bottom - textSize/4 ) ,paint);
+            if(eLanguage == Language.ELanguage.JAP){
+                canvas.drawText(item.getText() , item.getPosition ().left, item.getPosition ().bottom ,paint);
+            } else if(eLanguage == Language.ELanguage.VIE || eLanguage == Language.ELanguage.ENG) {
+                canvas.drawText(item.getText() , item.getPosition ().left, item.getPosition ().bottom - (item.getPosition ().height () / 4 ) ,paint);
+            }
+
         }
+
         return bitmap;
     }
 
@@ -344,7 +351,7 @@ public class CameraActivity extends NavigatorFooterActivity
                 minSize = guessSize;
                 guessSize = ((maxSize -minSize) / 2) + minSize;
             }
-            if((maxSize - minSize) <= 2){
+            if((maxSize - minSize) <= 1){
                 size = maxSize;
                 break;
             }
@@ -352,41 +359,29 @@ public class CameraActivity extends NavigatorFooterActivity
 
         Rect bounds = new Rect();
         maxSize = size;
-        minSize = 0;
-        guessSize = (maxSize - minSize) / 2;
+        minSize = maxSize / 2;
 
-        paint.setTextSize(guessSize);
+        paint.setTextSize(maxSize);
         paint.getTextBounds(str, 0, str.length(), bounds);
         if(bounds.height () < maxHeight)
             return size;
 
         while (true){
-            paint.setTextSize(guessSize);
+            paint.setTextSize(maxSize - minSize);
             paint.getTextBounds(str, 0, str.length(), bounds);
-
-            if(bounds.height () == maxHeight){
-                size = guessSize;
-                break;
-            }
-            else if(bounds.height () > maxHeight){
-                maxSize = guessSize;
-                guessSize = (maxSize -minSize)/2  + minSize;
-            }
-            else{
-                minSize = guessSize;
-                guessSize = ((maxSize -minSize) / 2) + minSize;
-            }
-            if((maxSize - minSize) <= 2){
+            if(minSize <= 1 ){
                 size = maxSize;
                 break;
             }
+            if(bounds.height () > maxHeight){
+                maxSize = maxSize - minSize;
+                minSize = maxSize / 2;
+            }
+            else{
+                minSize = minSize / 2;
+            }
+
         }
-
-//        do {
-//            paint.getTextBounds("a", 0, 1, bounds);
-//            paint.setTextSize(-- size);
-//        } while(bounds.height () > maxHeight);
-
         return size;
     }
 
@@ -451,21 +446,16 @@ public class CameraActivity extends NavigatorFooterActivity
     public void update(Observable o, Object arg) {
         if(o instanceof PreviewMode){
             if(previewController.isPreviewMode()){
-                Toast.makeText(getApplicationContext(), "PreviewMode is on", Toast.LENGTH_SHORT).show();
-
                 surfaceView.bringToFront();
             } else {
-                Toast.makeText(getApplicationContext(), "PreviewMode is off", Toast.LENGTH_SHORT).show();
-                arMask.bringToFront();
+
             }
         } else if (o instanceof ProcessingMode){
             if(processingController.isProcessingMode()){
-                Toast.makeText(getApplicationContext(), "Processing mode is on", Toast.LENGTH_SHORT).show();
                 panelProgressBar.setVisibility(View.VISIBLE);
                 panelProgressBar.bringToFront();
                 btnTakeButton.setClickable(false);
             } else {
-                Toast.makeText(getApplicationContext(), "Processing mode is off", Toast.LENGTH_SHORT).show();
                 panelProgressBar.setVisibility(View.GONE);
                 btnTakeButton.setClickable(true);
             }

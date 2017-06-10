@@ -46,11 +46,11 @@ public class CameraPresenter implements CameraContract.ICameraPresenter {
         mTranslate.setOnTranslateListener(new ITranslate.OnTranslateListener() {
             @Override
             public void onSuccess(TranslatorResponse result) {
-                List<DetectResult> detectResults = new ArrayList<DetectResult> (  );
-                for (Translation item : result.getData ().getTranslations ()) {
-                    detectResults.add ( DetectResult.parseDetectResult ( item.getTranslatedText () ) );
+                List<Translation> lst = result.getData().getTranslations();
+                for(int i = 0 , length = lst.size(); i < length ; i++ ){
+                    detectResultCache.get(i).setTranslatedText ( lst.get(i).getTranslatedText() );
                 }
-                mView.displayResult(detectResults, width, height);
+                mView.displayResult(detectResultCache, width, height);
             }
 
             @Override
@@ -64,7 +64,7 @@ public class CameraPresenter implements CameraContract.ICameraPresenter {
                 detectResultCache = result;
                 List<String> srcString = new ArrayList<String> (  );
                 for (DetectResult item : result) {
-                    srcString.add ( item.toString () );
+                    srcString.add ( item.getSrcText() );
                 }
                 mTranslate.translate(srcString, Language.getShortLanguage ( mView.getSrcLang() ),Language.getShortLanguage ( mView.getDestLang() ) );
             }
@@ -96,7 +96,7 @@ public class CameraPresenter implements CameraContract.ICameraPresenter {
         if(detectResultCache != null) {
             List<String> srcString = new ArrayList<String> (  );
             for (DetectResult item : detectResultCache) {
-                srcString.add ( item.toString () );
+                srcString.add ( item.getSrcText() );
             }
             mTranslate.translate(srcString, Language.getShortLanguage ( mView.getSrcLang() ),Language.getShortLanguage ( mView.getDestLang() ) );
         }

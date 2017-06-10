@@ -3,12 +3,8 @@ package com.ndanh.mytranslator.modulesimpl;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Rect;
-import com.googlecode.leptonica.android.Binarize;
-import com.googlecode.leptonica.android.Pix;
-import com.googlecode.leptonica.android.ReadFile;
-import com.googlecode.leptonica.android.WriteFile;
+
 import com.googlecode.tesseract.android.ResultIterator;
 import com.googlecode.tesseract.android.TessBaseAPI;
 import com.ndanh.mytranslator.model.DetectResult;
@@ -54,6 +50,7 @@ public class TextDetextModuleImpl implements IDetector {
     public void setLanguage(String lang) {
         checkFile(new File(datapath + "tessdata/"), lang);
         mTess = new TessBaseAPI();
+
         mTess.init(datapath, lang);
     }
 
@@ -62,18 +59,18 @@ public class TextDetextModuleImpl implements IDetector {
         mTess.setImage ( bitmap );
         mTess.getUTF8Text();
         ResultIterator iterator = mTess.getResultIterator ();
+        int level = TessBaseAPI.PageIteratorLevel.RIL_WORD;
         List<DetectResult> result = new ArrayList<DetectResult> ();
         DetectResult item = new DetectResult ();
-        while (iterator.next(TessBaseAPI.PageIteratorLevel.RIL_WORD)){
-            if(iterator.confidence ( TessBaseAPI.PageIteratorLevel.RIL_WORD ) < 80) continue;
-            if(iterator.getUTF8Text ( TessBaseAPI.PageIteratorLevel.RIL_WORD ) == "1")continue;
-            if(checkPosition ( item ,iterator.getBoundingRect ( TessBaseAPI.PageIteratorLevel.RIL_WORD ))){
-                item.mergeText (iterator.getUTF8Text ( TessBaseAPI.PageIteratorLevel.RIL_WORD ) );
-                item.mergePosition (iterator.getBoundingRect ( TessBaseAPI.PageIteratorLevel.RIL_WORD ));
+        while (iterator.next(level)){
+            if(iterator.confidence ( level ) < 80) continue;
+            if(iterator.getUTF8Text ( level ) == "1")continue;
+            if(checkPosition ( item ,iterator.getBoundingRect ( level ))){
+                item.merge (iterator.getBoundingRect ( level ) ,iterator.getUTF8Text ( level ));
             } else {
                 item = new DetectResult ();
-                item.setText(iterator.getUTF8Text ( TessBaseAPI.PageIteratorLevel.RIL_WORD ));
-                item.setPosition (iterator.getBoundingRect ( TessBaseAPI.PageIteratorLevel.RIL_WORD ));
+                item.setSrcText(iterator.getUTF8Text ( level ));
+                item.setPosition (iterator.getBoundingRect ( level ));
                 result.add ( item );
             }
         }
@@ -88,7 +85,7 @@ public class TextDetextModuleImpl implements IDetector {
 //        while (iterator.next(TessBaseAPI.PageIteratorLevel.RIL_TEXTLINE)){
 //            if(iterator.confidence ( TessBaseAPI.PageIteratorLevel.RIL_TEXTLINE ) < 50) continue;
 //            item = new DetectResult ();
-//            item.setText(iterator.getUTF8Text ( TessBaseAPI.PageIteratorLevel.RIL_TEXTLINE ));
+//            item.setSrcText(iterator.getUTF8Text ( TessBaseAPI.PageIteratorLevel.RIL_TEXTLINE ));
 //            item.setPosition (iterator.getBoundingRect ( TessBaseAPI.PageIteratorLevel.RIL_TEXTLINE ));
 //            result.add ( item );
 //        }
@@ -148,10 +145,10 @@ public class TextDetextModuleImpl implements IDetector {
     }
 
     private boolean checkPosition(DetectResult item, Rect rect2){
-        if(item.getPosition () == null ||item.getText ()== null || rect2 == null)
+        if(item.getPosition () == null ||item.getSrcText()== null || rect2 == null)
             return false;
 
-        if(item.getText ().contains(".")) return false;
+        if(item.getSrcText().contains(".")) return false;
         Rect rect1 = item.getPosition ();
         if(rect1.bottom < rect2.top ){
             return false;

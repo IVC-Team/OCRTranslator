@@ -14,8 +14,7 @@ import static org.junit.Assert.assertEquals;
 public class TranslateModuleTest {
     @Test
     public void addition_isCorrect() throws Exception {
-        int a = CameraActivity.determineMaxTextSize("aaaaaaaaaaa", 300f, 15f);
-        assertEquals ( "abc", 10 , a );
+
     }
 
 }

@@ -1,16 +1,13 @@
 package com.ndanh.mytranslator.screen.camera;
 
 import android.Manifest;
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.annotation.IdRes;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.PopupMenu;
@@ -29,9 +26,6 @@ import com.ndanh.mytranslator.model.DetectResult;
 import com.ndanh.mytranslator.model.Language;
 import com.ndanh.mytranslator.util.PermissionHelper;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
 import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -306,16 +300,14 @@ public class CameraActivity extends NavigatorFooterActivity
 
         int textSize;
         for (DetectResult item: result) {
-            textSize = determineMaxTextSize(item.getText() , item.getPosition().width(), item.getPosition().height ());
+            textSize = determineMaxTextSize(item.getTranslatedText() , item.getPosition().width(), item.getPosition().height ());
             paint.setTextSize(textSize);
             if(eLanguage == Language.ELanguage.JAP){
-                canvas.drawText(item.getText() , item.getPosition ().left, item.getPosition ().bottom ,paint);
+                canvas.drawText(item.getTranslatedText() , item.getPosition ().left, item.getPosition ().bottom ,paint);
             } else if(eLanguage == Language.ELanguage.VIE || eLanguage == Language.ELanguage.ENG) {
-                canvas.drawText(item.getText() , item.getPosition ().left, item.getPosition ().bottom - (item.getPosition ().height () / 4 ) ,paint);
+                canvas.drawText(item.getTranslatedText() , item.getPosition ().left, item.getPosition ().bottom - (item.getPosition ().height () / 4 ) ,paint);
             }
-
         }
-
         return bitmap;
     }
 

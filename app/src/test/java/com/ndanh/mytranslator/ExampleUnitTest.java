@@ -22,8 +22,5 @@ public class ExampleUnitTest {
     @Test
     public void parseRect() throws Exception {
 
-        DetectResult item = DetectResult.parseDetectResult("<1-2-1-1>a");
-
-        assertEquals(item.getText (), "a");
     }
 }

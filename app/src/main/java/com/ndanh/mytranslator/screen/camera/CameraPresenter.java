@@ -76,7 +76,6 @@ public class CameraPresenter implements CameraContract.ICameraPresenter {
         this.mDetector = null;
         this.mTranslate = null;
         this.detectResultCache = null;
-        this.mView = null;
     }
 
     @Override

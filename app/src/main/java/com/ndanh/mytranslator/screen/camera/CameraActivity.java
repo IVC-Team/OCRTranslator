@@ -300,13 +300,9 @@ public class CameraActivity extends NavigatorFooterActivity
 
         int textSize;
         for (DetectResult item: result) {
-            textSize = determineMaxTextSize(item.getTranslatedText() , item.getPosition().width(), item.getPosition().height ());
+            textSize = determineMaxTextSize(item.getTranslatedText() , item.getPosition().width(), item.getPosition().height () * 0.7f );
             paint.setTextSize(textSize);
-            if(eLanguage == Language.ELanguage.JAP){
-                canvas.drawText(item.getTranslatedText() , item.getPosition ().left, item.getPosition ().bottom ,paint);
-            } else if(eLanguage == Language.ELanguage.VIE || eLanguage == Language.ELanguage.ENG) {
-                canvas.drawText(item.getTranslatedText() , item.getPosition ().left, item.getPosition ().bottom - (item.getPosition ().height () / 4 ) ,paint);
-            }
+            canvas.drawText(item.getTranslatedText() , item.getPosition ().left, item.getPosition ().bottom - (item.getPosition ().height () * 0.15f ) ,paint);
         }
         return bitmap;
     }
